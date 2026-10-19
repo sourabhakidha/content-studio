@@ -5,7 +5,7 @@ A no-database starter app for Akidha's daily healthcare news and content workflo
 ## What works
 - Responsive private-workspace-style dashboard (note: this starter has no login/authentication; do not put confidential data in it or treat its URL as private).
 - News radar via Google News RSS search feeds, fetched through a Netlify Function.
-- Public social signal prototype using Reddit public search results; coverage is limited and can fail due to rate limits or source restrictions.
+- Reddit listening via public search for substitute/generic medicine questions, medicine prices, affordability, diabetes, blood pressure, thyroid, chronic care, online pharmacy trust and medicine literacy. For a small subset of the highest-relevance posts, it also fetches a few top comments as qualitative context. Supports custom Reddit searches, intent labels, relevance scoring, theme filters and turning a signal into a content-draft brief.
 - AI content drafts through a Netlify Function if `OPENAI_API_KEY` is configured.
 - Local draft editing, manual status approval, review flags, export/import JSON backup, and Markdown draft export.
 - No automatic publishing.
@@ -22,7 +22,7 @@ A no-database starter app for Akidha's daily healthcare news and content workflo
 - This is not authenticated. A Netlify URL is not private just because it is unlisted. Add Netlify site protection/access control before using it as a private internal tool, or keep the site on a controlled deployment.
 - Without a database, drafts and approval statuses are stored only in the current browser's localStorage. They do not sync across devices and may be lost if browser storage is cleared. Export backups regularly.
 - There is no scheduled daily collection in this version. Open the dashboard and refresh manually. A static site cannot retain daily collection results without a persistent store. Scheduled jobs could fetch and return current results, but preserving history requires storage.
-- Public social data is not representative research and must not be treated as medical evidence. Respect source terms and access rules.
+- Reddit listening is limited to public search endpoints and may fail due to Reddit rate limits or access restrictions. Results are self-selected, incomplete and not representative research; comments are qualitative context, not medical evidence. No usernames are stored in the dashboard results. Respect Reddit terms and access rules.
 - AI output is a draft only. Verify all medicine, quality, regulatory, safety and pricing claims; do not publish automatically. Never use this app to provide individualized treatment advice.
 
 ## Files
