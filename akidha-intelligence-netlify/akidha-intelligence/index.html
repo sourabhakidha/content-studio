@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8f4" />
+  <meta name="description" content="Akidha Intelligence — a private, education-first healthcare news and content workspace." />
+  <title>Akidha Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#home" aria-label="Akidha Intelligence home">
+        <span class="brand-mark">a</span><span><b>akidha</b><small>INTELLIGENCE</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span> Daily overview</button>
+        <button class="nav-item" data-view="news"><span class="nav-icon">↗</span> News radar <span class="nav-count" id="news-nav-count">—</span></button>
+        <button class="nav-item" data-view="social"><span class="nav-icon">◎</span> Social signals</button>
+        <button class="nav-item" data-view="ideas"><span class="nav-icon">✳</span> Content opportunities</button>
+        <button class="nav-item" data-view="drafts"><span class="nav-icon">▤</span> Draft studio <span class="nav-count" id="draft-nav-count">0</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-card"><span class="privacy-dot"></span><div><b>Local workspace</b><small>Your saved drafts stay in this browser.</small></div></div>
+        <button class="nav-item" id="export-all"><span class="nav-icon">↓</span> Export workspace</button>
+        <button class="nav-item" id="import-trigger"><span class="nav-icon">↑</span> Import backup</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden />
+        <div class="sidebar-foot">Built for thoughtful healthcare communication.<br><span>Evidence first. People always.</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">a</span><b>akidha <span>intelligence</span></b></div>
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><b id="crumb-current">Daily overview</b></div>
+        <div class="top-actions"><span class="date-chip" id="today-label">Today</span><button class="icon-button" id="refresh-btn" title="Refresh sources" aria-label="Refresh sources">↻</button><div class="avatar">A</div></div>
+      </header>
+
+      <section class="view active" id="view-overview">
+        <div class="welcome-row"><div><div class="eyebrow">YOUR DAILY INTELLIGENCE BRIEF</div><h1>Good morning, Akidha.</h1><p class="lede">A clearer view of what matters in chronic care, pharma and patient trust.</p></div><button class="button button-primary" id="run-scan"><span>↻</span> Refresh intelligence</button></div>
+        <div class="notice" id="status-notice"><span class="notice-icon">i</span><div><b>Starter workspace</b><span>Live source collection is available through Netlify Functions after deployment. Examples are labelled until a live scan completes.</span></div><button class="notice-close" id="close-notice" aria-label="Dismiss notice">×</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>News signals</span><span class="stat-icon sage">↗</span></div><div class="stat-number" id="stat-news">—</div><div class="stat-caption">Collected from configured feeds</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Social signals</span><span class="stat-icon lilac">◎</span></div><div class="stat-number" id="stat-social">—</div><div class="stat-caption">Public discussion results</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Content opportunities</span><span class="stat-icon peach">✳</span></div><div class="stat-number" id="stat-ideas">3</div><div class="stat-caption">Ideas to consider today</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Drafts to review</span><span class="stat-icon blue">▤</span></div><div class="stat-number" id="stat-drafts">0</div><div class="stat-caption">Nothing publishes automatically</div></article>
+        </div>
+        <div class="section-heading"><div><h2>Today's focus</h2><p>Signals that could become useful, trust-building content.</p></div><button class="text-button" data-goto="ideas">View all opportunities <span>→</span></button></div>
+        <div class="focus-grid" id="focus-grid"></div>
+        <div class="lower-grid">
+          <section class="panel"><div class="panel-heading"><div><h3>Latest news radar</h3><p>Recent results from configured sources</p></div><button class="text-button" data-goto="news">See all →</button></div><div id="overview-news" class="signal-list"></div></section>
+          <section class="panel"><div class="panel-heading"><div><h3>Akidha content compass</h3><p>Keep every idea aligned with the brand</p></div><span class="compass-mark">a</span></div><div class="compass-list"><div><span class="compass-dot"></span><div><b>Teach first</b><p>Explain medicines and choices in simple, calm language.</p></div></div><div><span class="compass-dot"></span><div><b>Build trust</b><p>Show the verification process; don't ask people to take claims on faith.</p></div></div><div><span class="compass-dot"></span><div><b>Respect the patient</b><p>No fear tactics, unsupported promises or personal treatment advice.</p></div></div></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-news"><div class="page-heading"><div><div class="eyebrow">INDUSTRY RADAR</div><h1>News radar</h1><p class="lede">Follow developments that could affect chronic-care patients and the Indian pharma landscape.</p></div><button class="button button-primary" id="news-refresh">Refresh news ↻</button></div><div class="toolbar"><input id="news-search" class="search-input" placeholder="Search headlines, topics or sources…" /><select id="news-filter" class="select-input"><option value="all">All signals</option><option value="regulation">Policy & regulation</option><option value="pricing">Pricing & affordability</option><option value="chronic">Chronic care</option><option value="industry">Industry</option></select></div><div id="news-list" class="content-list"></div></section>
+
+      <section class="view" id="view-social"><div class="page-heading"><div><div class="eyebrow">PUBLIC CONVERSATIONS</div><h1>Social signals</h1><p class="lede">Notice the questions, confusion and trust concerns people raise in public discussions.</p></div><button class="button button-primary" id="social-refresh">Refresh signals ↻</button></div><div class="notice notice-muted"><span class="notice-icon">i</span><div><b>Context matters</b><span>Public posts are anecdotes, not medical evidence or a representative view of patients. Personal identifiers are not needed for content planning.</span></div></div><div class="toolbar"><input id="social-search" class="search-input" placeholder="Search discussion themes…" /><select id="social-filter" class="select-input"><option value="all">All themes</option><option value="trust">Trust & quality</option><option value="cost">Medicine costs</option><option value="confusion">Medicine confusion</option><option value="care">Chronic care</option></select></div><div id="social-list" class="content-list"></div></section>
+
+      <section class="view" id="view-ideas"><div class="page-heading"><div><div class="eyebrow">FROM SIGNAL TO STORY</div><h1>Content opportunities</h1><p class="lede">A focused shortlist of ideas that help Akidha educate, reassure and earn trust.</p></div><button class="button button-primary" id="generate-ideas">Create draft from idea ✳</button></div><div class="filter-pills"><button class="pill active" data-idea-filter="all">All opportunities</button><button class="pill" data-idea-filter="education">Medicine education</button><button class="pill" data-idea-filter="trust">Trust & transparency</button><button class="pill" data-idea-filter="caregivers">Caregiver support</button></div><div id="ideas-list" class="idea-grid"></div></section>
+
+      <section class="view" id="view-drafts"><div class="page-heading"><div><div class="eyebrow">HUMAN APPROVAL REQUIRED</div><h1>Draft studio</h1><p class="lede">Edit the copy, check every claim, and approve it for your own workflow. This app never publishes posts.</p></div><button class="button button-secondary" id="export-drafts">Export drafts ↓</button></div><div class="review-banner"><span class="review-symbol">✓</span><div><b>Your review is the final checkpoint.</b><p>Medicine, safety, quality and savings claims must be verified before content is used publicly.</p></div></div><div id="drafts-list" class="drafts-grid"></div></section>
+
+      <footer class="main-footer"><span>Akidha Intelligence · Private workspace</span><span>Evidence first · Education before promotion</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-backdrop" id="draft-modal" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><div class="eyebrow">AI CONTENT ASSISTANT</div><h2 id="modal-title">Create an Akidha draft</h2></div><button class="icon-button" id="modal-close" aria-label="Close">×</button></div><p class="modal-help">Drafts are suggestions, not medical advice. Verify every factual claim before use.</p><label class="field-label" for="draft-topic">What should this draft cover?</label><textarea id="draft-topic" rows="3" placeholder="e.g. Explain what patients should ask their doctor before considering a medicine substitute."></textarea><div class="form-row"><div><label class="field-label" for="draft-platform">Platform</label><select id="draft-platform"><option>Instagram carousel</option><option>Instagram Reel</option><option>Facebook post</option><option>LinkedIn post</option><option>YouTube Short</option><option>WhatsApp educational message</option></select></div><div><label class="field-label" for="draft-tone">Content goal</label><select id="draft-tone"><option>Educate and reassure</option><option>Address a common objection</option><option>Support caregivers</option><option>Explain trust and verification</option></select></div></div><div class="modal-actions"><button class="button button-secondary" id="cancel-draft">Cancel</button><button class="button button-primary" id="make-draft">Generate draft</button></div><div class="generation-status" id="generation-status"></div></section></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
