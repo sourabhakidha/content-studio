@@ -39,3 +39,13 @@
 .os-modal-actions{display:flex;justify-content:flex-end;gap:10px;padding-top:6px}
 @media(max-width:900px){#os-workspace .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#os-workspace .lower-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.os-modal-backdrop{padding:12px;align-items:end}.os-modal{padding:22px 18px;border-radius:18px 18px 14px 14px;max-height:88vh}.os-form-grid{grid-template-columns:1fr}#os-workspace .page-heading{align-items:flex-start;flex-direction:column}#os-workspace .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#os-workspace .stat-card{padding:14px}#os-workspace .stat-number{font-size:27px}}
+
+/* Learning Loop form readability and consistent control sizing */
+#os-learning-form{gap:16px!important;padding:22px!important;margin-bottom:18px}
+#os-learning-form label{display:grid;gap:7px;color:#425248;font-size:12px;font-weight:700}
+#os-learning-form input.search-input{height:44px;width:100%;font-size:13px;padding:10px 12px}
+#os-learning-form textarea.search-input{height:auto;min-height:92px;width:100%;font-size:13px;line-height:1.55;padding:11px 12px;resize:vertical}
+#os-learning-form button{justify-self:start;min-height:42px}
+#os-workspace .toolbar{align-items:center;flex-wrap:wrap}
+#os-workspace .toolbar .button{min-height:40px}
+#os-workspace .panel li{margin:8px 0;line-height:1.55}
