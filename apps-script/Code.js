@@ -18,30 +18,56 @@ const APP = {
   VERSION: '2.0.0',
   SHEETS: {
     Users: ['user_id', 'email', 'display_name', 'role', 'active', 'created_at'],
-    Tasks: ['task_id', 'title', 'brief', 'owner_email', 'status', 'priority', 'category',
+    Tasks: [
+      'task_id', 'title', 'brief', 'owner_email', 'status', 'priority', 'category',
       'goal_id', 'theme', 'due_date', 'estimate_minutes', 'actual_minutes', 'blocker_reason',
-      'doc_url', 'dependencies', 'completion_requested_by', 'completion_requested_at',
-      'completed_by', 'completed_at', 'is_archived', 'created_by', 'created_at', 'updated_at'],
-    Goals: ['goal_id', 'title', 'owner_email', 'metric_key', 'unit', 'direction',
+      'completion_requested_by', 'completion_requested_at', 'completed_by', 'completed_at',
+      'created_by', 'created_at', 'updated_at',
+      'doc_url', 'dependencies', 'is_archived'
+    ],
+    Goals: [
+      'goal_id', 'title', 'owner_email', 'metric_key', 'unit', 'direction',
       'baseline_value', 'target_value', 'current_value', 'measurement_source',
-      'start_date', 'end_date', 'status', 'is_archived', 'updated_at'],
-    TaskDependencies: ['dependency_id', 'task_id', 'depends_on_task_id', 'dependency_type', 'created_at'],
-    Approvals: ['approval_id', 'task_id', 'approval_type', 'requested_by', 'reviewer_email', 'decision',
-      'comments', 'requested_at', 'decided_at'],
+      'start_date', 'end_date', 'status', 'updated_at',
+      'is_archived'
+    ],
+    TaskDependencies: [
+      'task_id', 'depends_on_task_id', 'dependency_type', 'created_at',
+      'dependency_id'
+    ],
+    Approvals: [
+      'approval_id', 'task_id', 'requested_by', 'reviewer_email', 'decision',
+      'comments', 'requested_at', 'decided_at',
+      'approval_type'
+    ],
     Themes: ['theme_id', 'name', 'description', 'audience_segment', 'status', 'created_at'],
-    WorkBlocks: ['block_id', 'task_id', 'owner_email', 'shift_key', 'starts_at', 'ends_at',
-      'status', 'override_reason', 'created_at'],
-    Creatives: ['creative_id', 'task_id', 'title', 'platform', 'format', 'workflow_stage',
-      'medical_review_required', 'medical_review_status', 'medical_review_notes', 'asset_drive_url',
-      'compliance_flags', 'publish_url', 'published_at', 'is_archived', 'created_at', 'updated_at'],
-    Performance: ['observation_id', 'creative_id', 'goal_id', 'metric_key', 'metric_value',
-      'unit', 'period_start', 'period_end', 'source', 'source_url', 'imported_at'],
-    Learnings: ['learning_id', 'campaign_name', 'creative_id', 'observation', 'hypothesis',
-      'next_test', 'status', 'approved_by', 'created_by', 'created_at'],
-    MarketSignals: ['signal_id', 'source', 'category', 'title', 'summary', 'url',
-      'intent', 'relevance_score', 'status', 'captured_at'],
-    AuditLog: ['event_id', 'actor_email', 'entity_type', 'entity_id', 'action',
-      'details', 'created_at']
+    WorkBlocks: [
+      'block_id', 'task_id', 'owner_email', 'starts_at', 'ends_at', 'status',
+      'proposed_by', 'confirmed_by', 'confirmed_at', 'override_reason',
+      'shift_key', 'created_at'
+    ],
+    Creatives: [
+      'creative_id', 'task_id', 'title', 'platform', 'format', 'workflow_stage',
+      'medical_review_required', 'medical_review_status', 'publish_url', 'published_at',
+      'created_at', 'updated_at',
+      'medical_review_notes', 'asset_drive_url', 'compliance_flags', 'is_archived'
+    ],
+    Performance: [
+      'observation_id', 'creative_id', 'goal_id', 'metric_key', 'metric_value',
+      'unit', 'period_start', 'period_end', 'source', 'source_url', 'imported_at'
+    ],
+    Learnings: [
+      'learning_id', 'campaign_name', 'creative_id', 'observation', 'hypothesis',
+      'next_test', 'status', 'approved_by', 'created_by', 'created_at'
+    ],
+    MarketSignals: [
+      'signal_id', 'source', 'category', 'title', 'summary', 'url',
+      'intent', 'relevance_score', 'status', 'captured_at'
+    ],
+    AuditLog: [
+      'event_id', 'actor_email', 'entity_type', 'entity_id', 'action',
+      'details', 'created_at'
+    ]
   },
   STATUSES: [
     'Backlog', 'Ideation', 'Scripting', 'Admin Review', 'Storyboard',
@@ -143,7 +169,11 @@ const Db = {
   appendObject(sheetName, obj) {
     const sh = this.getSpreadsheet().getSheetByName(sheetName);
     if (!sh) throw new Error('Missing tab ' + sheetName + '. Run setupDatabase().');
-    const headers = APP.SHEETS[sheetName];
+    let headers = [];
+    if (sh.getLastRow() >= 1 && sh.getLastColumn() >= 1) {
+      headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+    }
+    if (!headers.length) headers = APP.SHEETS[sheetName] || [];
     const row = headers.map(h => Object.prototype.hasOwnProperty.call(obj, h) ? obj[h] : '');
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
@@ -263,28 +293,121 @@ const Auth = {
 };
 
 /* ==========================================================================
-   5. DATABASE SETUP & SEEDING
+   5. DATABASE SETUP, SEEDING & SAFE SCHEMA MIGRATION
    ========================================================================== */
 
+/**
+ * Initializes database tabs and guarantees complete, non-destructive schema alignment.
+ * If run against an existing database, it safely appends any missing columns to existing tabs
+ * and provisions any newly introduced tabs (Learnings, MarketSignals) without altering existing data.
+ */
 function setupDatabase() {
-  const ss = Db.getSpreadsheet();
-  Object.keys(APP.SHEETS).forEach(name => {
-    let sh = ss.getSheetByName(name);
-    if (!sh) sh = ss.insertSheet(name);
-    const headers = APP.SHEETS[name];
-    if (sh.getLastRow() === 0) {
-      sh.getRange(1, 1, 1, headers.length).setValues([headers]);
-      sh.setFrozenRows(1);
-      sh.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#244b63').setFontColor('#ffffff');
-      sh.autoResizeColumns(1, headers.length);
-    }
-  });
+  const report = runSchemaMigration_(false);
 
   seedDefaultUsers_();
   seedDefaultThemes_();
   seedDefaultGoals_();
 
-  return 'Akidha Marketing OS database tabs initialized successfully.';
+  return 'Akidha Marketing OS database verified & ready. Migration summary: ' +
+    report.tabsCreated.length + ' tab(s) created, ' +
+    Object.keys(report.columnsAdded).length + ' tab(s) upgraded with new columns.';
+}
+
+/**
+ * Dry-run inspection of the database schema.
+ * Returns the exact difference between existing spreadsheet headers and target v2 schema.
+ */
+function checkDatabaseSchema() {
+  const user = Auth.getCurrentUser();
+  Auth.requireAdmin(user);
+  const report = runSchemaMigration_(true);
+  Logger.log('=== AKIDHA MARKETING OS: DRY-RUN SCHEMA VERIFICATION REPORT ===');
+  Logger.log(JSON.stringify(report, null, 2));
+  return report;
+}
+
+/**
+ * Explicit schema migration endpoint for administrators.
+ * Safely adds missing columns to existing tabs and creates missing tabs.
+ */
+function migrateDatabase() {
+  const user = Auth.getCurrentUser();
+  Auth.requireAdmin(user);
+  const report = runSchemaMigration_(false);
+  audit_(user.email, 'database', 'schema', 'migrated', JSON.stringify(report.columnsAdded));
+  return report;
+}
+
+/**
+ * Core idempotent schema migration engine.
+ * @param {boolean} dryRun - If true, inspects and computes diff without writing to spreadsheet.
+ */
+function runSchemaMigration_(dryRun) {
+  const ss = Db.getSpreadsheet();
+  const report = {
+    timestamp: new Date().toISOString(),
+    dryRun: !!dryRun,
+    tabsCreated: [],
+    columnsAdded: {},
+    tabsAlreadyUpToDate: [],
+    details: []
+  };
+
+  Object.keys(APP.SHEETS).forEach(tabName => {
+    let sh = ss.getSheetByName(tabName);
+    const targetHeaders = APP.SHEETS[tabName];
+
+    // 1. Tab does not exist
+    if (!sh) {
+      report.tabsCreated.push(tabName);
+      report.details.push('Created new tab "' + tabName + '" with ' + targetHeaders.length + ' columns.');
+      if (!dryRun) {
+        sh = ss.insertSheet(tabName);
+        sh.getRange(1, 1, 1, targetHeaders.length).setValues([targetHeaders]);
+        sh.setFrozenRows(1);
+        sh.getRange(1, 1, 1, targetHeaders.length).setFontWeight('bold').setBackground('#244b63').setFontColor('#ffffff');
+        sh.autoResizeColumns(1, targetHeaders.length);
+      }
+      return;
+    }
+
+    // 2. Tab is empty (0 rows)
+    if (sh.getLastRow() === 0) {
+      report.columnsAdded[tabName] = [...targetHeaders];
+      report.details.push('Initialized empty tab "' + tabName + '" with ' + targetHeaders.length + ' headers.');
+      if (!dryRun) {
+        sh.getRange(1, 1, 1, targetHeaders.length).setValues([targetHeaders]);
+        sh.setFrozenRows(1);
+        sh.getRange(1, 1, 1, targetHeaders.length).setFontWeight('bold').setBackground('#244b63').setFontColor('#ffffff');
+        sh.autoResizeColumns(1, targetHeaders.length);
+      }
+      return;
+    }
+
+    // 3. Tab exists with data. Read row 1 headers.
+    const lastCol = sh.getLastColumn();
+    const existingHeaders = sh.getRange(1, 1, 1, lastCol).getValues()[0].map(String);
+    const missing = targetHeaders.filter(col => !existingHeaders.includes(col));
+
+    if (missing.length === 0) {
+      report.tabsAlreadyUpToDate.push(tabName);
+      return;
+    }
+
+    // Append missing columns to the right of existing columns
+    report.columnsAdded[tabName] = missing;
+    const startCol = existingHeaders.length + 1;
+    report.details.push('Tab "' + tabName + '": appended ' + missing.length + ' missing column(s) [' + missing.join(', ') + '] starting at col ' + startCol + '.');
+
+    if (!dryRun) {
+      sh.getRange(1, startCol, 1, missing.length).setValues([missing]);
+      sh.getRange(1, startCol, 1, missing.length).setFontWeight('bold').setBackground('#244b63').setFontColor('#ffffff');
+      sh.autoResizeColumns(startCol, missing.length);
+    }
+  });
+
+  report.isUpToDate = report.tabsCreated.length === 0 && Object.keys(report.columnsAdded).length === 0;
+  return report;
 }
 
 function seedDefaultUsers_() {
