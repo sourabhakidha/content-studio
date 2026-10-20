@@ -3,3 +3,49 @@
 /* Reddit listening additions */
 .social-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 16px}.social-summary>div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}.social-summary b,.social-summary span{display:block}.social-summary b{font:800 22px Manrope,sans-serif;letter-spacing:-.5px;color:var(--green)}.social-summary span{font-size:10px;color:#89948c;margin-top:3px}.reddit-controls{display:flex;gap:10px;margin:-4px 0 17px}.reddit-controls .search-input{background:#fff}.reddit-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.reddit-chips span{background:#f4f6f1;border:1px solid #edf0e9;border-radius:5px;padding:4px 6px;font-size:9px;color:#6f7c72}.reddit-item .content-item-main{min-width:0}.comment-preview{border:1px solid #edf0e9;background:#fafbf8;border-radius:8px;padding:9px 11px;margin:10px 0}.comment-preview summary{cursor:pointer;font-size:10px;font-weight:700;color:var(--green)}.comment-preview blockquote{border-left:2px solid #cbd9cc;padding:5px 0 5px 10px;margin:10px 0 0;color:#6d7a70;font-size:10px;line-height:1.55}.signal-caveat{font-size:9px!important;color:#9a7a54!important;margin-top:8px!important}.source-errors{padding:10px 12px;margin-bottom:12px;border:1px solid #f1dfc7;background:#fff8ef;color:#8d6739;border-radius:8px;font-size:10px;line-height:1.5}.source-errors[hidden]{display:none}
 @media(max-width:700px){.social-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.reddit-controls{flex-direction:column}.reddit-controls .button{width:100%}.reddit-item{flex-wrap:wrap}.reddit-item .item-actions{width:100%;flex-direction:row;justify-content:flex-end}.reddit-item .item-actions button{flex:1}}
+
+/* Marketing OS polish: quieter hierarchy, cohesive workspace, accessible task dialog */
+#os-nav-group{margin-top:8px;padding-top:4px}
+#os-nav-group .workspace-label{padding:0 12px 10px}
+#os-nav-group .nav-item{font-size:12px;padding:10px 12px}
+#os-workspace .page-heading{align-items:center;margin:4px 0 26px}
+#os-workspace .page-heading h1{font-size:clamp(28px,3vw,38px);letter-spacing:-1.5px}
+#os-workspace .eyebrow{color:#718477}
+#os-workspace .notice{padding:15px 17px;border-radius:12px}
+#os-workspace .stats-grid{gap:16px;margin:22px 0 26px}
+#os-workspace .stat-card{padding:20px;border-radius:14px;box-shadow:0 3px 14px rgba(30,54,42,.035)}
+#os-workspace .stat-number{font-size:32px;letter-spacing:-1px}
+#os-workspace .lower-grid{gap:18px}
+#os-workspace .panel{border-radius:14px;padding:20px}
+#os-workspace .panel-heading{margin-bottom:10px}
+#os-workspace .signal-row{padding:14px 0}
+#os-workspace .focus-card{border-radius:14px;padding:20px}
+#os-workspace .tag{border-radius:999px;padding:5px 9px}
+.os-modal-open{overflow:hidden}
+.os-modal-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:rgba(20,31,25,.46);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.os-modal-backdrop[hidden]{display:none}
+.os-modal{width:min(100%,560px);max-height:min(90vh,760px);overflow:auto;background:#fff;border:1px solid rgba(255,255,255,.8);border-radius:20px;padding:28px;box-shadow:0 28px 90px rgba(14,30,20,.24);animation:osModalIn .18s ease-out}
+@keyframes osModalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+.os-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
+.os-modal-head h2{font:800 26px/1.2 Manrope,sans-serif;letter-spacing:-.7px;margin:8px 0}
+.os-modal-head p{margin:0;color:#7a877f;font-size:13px;line-height:1.5}
+.os-modal-close{flex:0 0 36px;width:36px;height:36px;border:1px solid #e7ebe5;border-radius:10px;background:#f8faf7;color:#526258;font-size:23px;line-height:1}
+.os-task-form{display:grid;gap:17px}
+.os-task-form label{display:grid;gap:7px;color:#425248;font-size:12px;font-weight:700}
+.os-task-form input,.os-task-form select{width:100%;min-width:0;min-height:43px;border:1px solid #dfe6de;border-radius:10px;padding:10px 12px;background:#fff;color:#24352b;outline:none;font-weight:500}
+.os-task-form input:focus,.os-task-form select:focus{border-color:#638a70;box-shadow:0 0 0 3px rgba(99,138,112,.14)}
+.os-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.os-optional{font-size:10px;font-weight:500;color:#89948c;margin-left:4px}
+.os-modal-actions{display:flex;justify-content:flex-end;gap:10px;padding-top:6px}
+@media(max-width:900px){#os-workspace .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#os-workspace .lower-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.os-modal-backdrop{padding:12px;align-items:end}.os-modal{padding:22px 18px;border-radius:18px 18px 14px 14px;max-height:88vh}.os-form-grid{grid-template-columns:1fr}#os-workspace .page-heading{align-items:flex-start;flex-direction:column}#os-workspace .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#os-workspace .stat-card{padding:14px}#os-workspace .stat-number{font-size:27px}}
+
+/* Learning Loop form readability and consistent control sizing */
+#os-learning-form{gap:16px!important;padding:22px!important;margin-bottom:18px}
+#os-learning-form label{display:grid;gap:7px;color:#425248;font-size:12px;font-weight:700}
+#os-learning-form input.search-input{height:44px;width:100%;font-size:13px;padding:10px 12px}
+#os-learning-form textarea.search-input{height:auto;min-height:92px;width:100%;font-size:13px;line-height:1.55;padding:11px 12px;resize:vertical}
+#os-learning-form button{justify-self:start;min-height:42px}
+#os-workspace .toolbar{align-items:center;flex-wrap:wrap}
+#os-workspace .toolbar .button{min-height:40px}
+#os-workspace .panel li{margin:8px 0;line-height:1.55}
