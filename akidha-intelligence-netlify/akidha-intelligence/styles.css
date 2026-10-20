@@ -174,3 +174,16 @@ body{background:#f2efe6;color:#182b22;font-family:'DM Sans',sans-serif}
 .os-modal{background:#fffdf8;border-radius:4px 22px 4px 22px}
 .os-modal-head{border-bottom:1px solid #e0dacd}
 @media(max-width:760px){.main-content{padding:0 14px 30px}.os-hero{padding:25px 22px;min-height:0}.sidebar{width:100%;position:relative}.sidebar .nav{display:block}}
+
+
+/* Workspace workflow and audit views */
+.workspace-view-tabs { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.workspace-view-tabs .search-input { flex:1 1 220px; }
+.workflow-table-wrap { width:100%; overflow-x:auto; border:1px solid var(--border,#e3e7df); border-radius:14px; background:var(--surface,#fff); margin:16px 0 28px; }
+.workflow-table { width:100%; border-collapse:collapse; min-width:760px; font-size:13px; }
+.workflow-table th { text-align:left; text-transform:uppercase; letter-spacing:.07em; font-size:10px; color:var(--muted,#78847b); background:var(--surface-muted,#f5f6f2); padding:14px 16px; white-space:nowrap; }
+.workflow-table td { padding:14px 16px; border-top:1px solid var(--border,#e7e9e3); vertical-align:top; line-height:1.5; }
+.workflow-table tbody tr:hover { background:var(--surface-muted,#f8f9f6); }
+.workflow-history-row td { color:var(--muted,#78847b); font-size:12px; background:var(--surface-muted,#fafbf8); }
+#os-task-view [data-stage], #os-task-view [data-status] { width:100%; margin-top:6px; }
+#os-task-view .focus-card label { display:block; margin-top:12px; font-size:12px; }
