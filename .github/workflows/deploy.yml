@@ -61,9 +61,6 @@ jobs:
             fs.writeFileSync('.clasp.json', JSON.stringify(cfg, null, 2));
           "
 
-      - name: Push Code to Apps Script
-        run: clasp push --force
-
       - name: Verify Production Deployment ID
         if: ${{ inputs.environment == 'production' }}
         env:
@@ -73,6 +70,9 @@ jobs:
             echo "::error::Set PROD_DEPLOYMENT_ID to the existing live deployment ID before deploying."
             exit 1
           fi
+
+      - name: Push Code to Apps Script
+        run: clasp push --force
 
       - name: Update Existing Production Deployment
         if: ${{ inputs.environment == 'production' }}
