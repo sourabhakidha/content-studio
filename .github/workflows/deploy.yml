@@ -49,17 +49,34 @@ jobs:
           else
             SCRIPT_ID="${{ secrets.STAGING_SCRIPT_ID }}"
           fi
-          node -e "
+          if [ -z "$SCRIPT_ID" ]; then
+            echo "::error::Missing script ID secret for target environment."
+            exit 1
+          fi
+          TARGET_SCRIPT_ID="$SCRIPT_ID" node -e "
             const fs = require('fs');
             const cfg = JSON.parse(fs.readFileSync('.clasp.json', 'utf8'));
-            cfg.scriptId = '$SCRIPT_ID';
+            cfg.scriptId = process.env.TARGET_SCRIPT_ID;
+            cfg.rootDir = 'apps-script';
             fs.writeFileSync('.clasp.json', JSON.stringify(cfg, null, 2));
           "
 
       - name: Push Code to Apps Script
         run: clasp push --force
 
-      - name: Version & Deploy
+      - name: Verify Production Deployment ID
         if: ${{ inputs.environment == 'production' }}
-        run: clasp deploy --description "${{ inputs.description }}"
+        env:
+          DEPLOYMENT_ID: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        run: |
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "::error::Set PROD_DEPLOYMENT_ID to the existing live deployment ID before deploying."
+            exit 1
+          fi
+
+      - name: Update Existing Production Deployment
+        if: ${{ inputs.environment == 'production' }}
+        env:
+          DEPLOYMENT_ID: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        run: clasp deploy --deploymentId "$DEPLOYMENT_ID" --description "${{ inputs.description }}"
 
