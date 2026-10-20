@@ -527,6 +527,23 @@ function getBootstrapData() {
     ? allCreatives.filter(c => c.medical_review_status === 'pending')
     : [];
 
+  // Scope secondary datasets to the caller's authorized tasks/creatives.
+  // Admins retain the cross-team view; contributors receive only their own linked records.
+  const visibleTaskIds = new Set(userTasks.map(t => String(t.task_id)));
+  const visibleCreativeIds = new Set(userCreatives.map(c => String(c.creative_id)));
+  const visibleDependencies = user.role === 'admin'
+    ? tables.TaskDependencies
+    : tables.TaskDependencies.filter(d => visibleTaskIds.has(String(d.task_id)));
+  const visiblePerformance = user.role === 'admin'
+    ? tables.Performance
+    : tables.Performance.filter(p => visibleCreativeIds.has(String(p.creative_id)));
+  const visibleLearnings = user.role === 'admin'
+    ? tables.Learnings
+    : tables.Learnings.filter(l =>
+        cleanEmail_(l.created_by) === user.email ||
+        visibleCreativeIds.has(String(l.creative_id))
+      );
+
   return {
     appName: APP.NAME,
     version: APP.VERSION,
@@ -543,10 +560,10 @@ function getBootstrapData() {
     creatives: userCreatives,
     approvals: pendingApprovals,
     pendingMedicalReviews: pendingMedicalReviews,
-    dependencies: tables.TaskDependencies,
+    dependencies: visibleDependencies,
     themes: tables.Themes,
-    performance: tables.Performance,
-    learnings: tables.Learnings,
+    performance: visiblePerformance,
+    learnings: visibleLearnings,
     marketSignals: tables.MarketSignals.slice(0, 50),
     capacity: calculateCapacityMetrics_(allTasks, team, '09')
   };
