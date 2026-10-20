@@ -581,6 +581,16 @@ function createTask(payload) {
 
   const requestedOwner = cleanEmail_(payload.owner_email || user.email);
   const ownerEmail = user.role === 'admin' ? requestedOwner : user.email;
+  const dependencyIds = payload.dependencies
+    ? Array.from(new Set(String(payload.dependencies).split(',').map(s => clean_(s.trim(), 80)).filter(Boolean)))
+    : [];
+  dependencyIds.forEach(depId => {
+    const prerequisite = Db.findById('Tasks', 'task_id', depId);
+    if (!prerequisite) throw new Error('Prerequisite task not found: ' + depId);
+    if (user.role !== 'admin' && cleanEmail_(prerequisite.owner_email) !== user.email) {
+      throw new Error('You can only link tasks you are authorized to access.');
+    }
+  });
 
   const id = newId_('T');
   const now = new Date();
@@ -613,9 +623,8 @@ function createTask(payload) {
   Db.appendObject('Tasks', row);
 
   // If dependencies specified, link them in TaskDependencies
-  if (payload.dependencies) {
-    const deps = String(payload.dependencies).split(',').map(s => s.trim()).filter(Boolean);
-    deps.forEach(depId => {
+  if (dependencyIds.length) {
+    dependencyIds.forEach(depId => {
       Db.appendObject('TaskDependencies', {
         dependency_id: newId_('DEP'),
         task_id: id,
