@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root{--ink:#172b3a;--muted:#627383;--line:#dce4ea;--bg:#f5f7f9;--blue:#244b63;--blue2:#e8f0f5;--white:#fff;--red:#a43b35}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Arial,sans-serif}
+    header{background:var(--blue);color:white;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    header h1{font-size:20px;margin:0}header p{margin:3px 0 0;color:#dce8ee}
+    main{max-width:1240px;margin:22px auto;padding:0 16px}.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab,button{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:white;color:var(--ink);cursor:pointer}
+    .tab.active,button.primary{background:var(--blue);color:white;border-color:var(--blue)}button:disabled{opacity:.5;cursor:wait}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}.card,.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:16px}
+    .metric{font-size:26px;font-weight:700;margin-top:6px}.muted{color:var(--muted)}.panel h2{font-size:17px;margin:0 0 12px}
+    .layout{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:16px;align-items:start}
+    label{display:block;font-weight:600;margin:10px 0 5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd6df;border-radius:7px;font:inherit;background:white}
+    textarea{min-height:76px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;gap:6px;flex-wrap:wrap}
+    .task{border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:9px}.tasktop{display:flex;justify-content:space-between;gap:12px}.task h3{margin:0;font-size:15px}
+    .pill{display:inline-block;padding:3px 8px;border-radius:20px;background:var(--blue2);font-size:12px;margin:6px 4px 0 0}
+    .task small{color:var(--muted)}.danger{color:var(--red)}.notice{padding:10px 12px;background:#fff6df;border:1px solid #efdfa9;border-radius:8px;margin:10px 0}
+    .success{padding:10px 12px;background:#e9f6ed;border:1px solid #b7dec2;border-radius:8px;margin:10px 0}
+    .hidden{display:none!important}.empty{padding:25px;text-align:center;color:var(--muted)}.approval{border:1px solid var(--line);padding:12px;border-radius:8px;margin-bottom:8px}
+    @media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}}
+    @media(max-width:480px){header{padding:16px}.grid{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}.metric{font-size:22px}}
+  </style>
+</head>
+<body>
+<header>
+  <div><h1>Akidha Marketing OS</h1><p>Plan · Produce · Measure · Learn</p></div>
+  <div id="userBadge">Loading access…</div>
+</header>
+<main>
+  <div id="message"></div>
+  <div class="topline"><div><strong id="greeting">Your workspace</strong><div class="muted">Shared tasks and goals, saved automatically to Google Sheets.</div></div><button onclick="refresh()">Refresh data</button></div>
+  <div class="grid">
+    <div class="card"><div class="muted">Open tasks</div><div class="metric" id="openCount">—</div></div>
+    <div class="card"><div class="muted">Overdue</div><div class="metric" id="overdueCount">—</div></div>
+    <div class="card"><div class="muted">Awaiting approval</div><div class="metric" id="approvalCount">—</div></div>
+    <div class="card"><div class="muted">Goals tracked</div><div class="metric" id="goalCount">—</div></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="tasks" onclick="showView('tasks')">Tasks</button>
+    <button class="tab" data-view="goals" onclick="showView('goals')">Goals</button>
+    <button class="tab" data-view="creatives" onclick="showView('creatives')">Creative workflow</button>
+    <button class="tab" data-view="approvals" id="approvalTab" onclick="showView('approvals')">Approvals</button>
+  </nav>
+  <section id="tasksView">
+    <div class="layout">
+      <div class="panel">
+        <h2>Create a task</h2>
+        <form id="taskForm" onsubmit="submitTask(event)">
+          <label for="title">Task title *</label><input id="title" maxlength="160" required placeholder="e.g. Draft educational carousel">
+          <label for="brief">Brief / acceptance criteria</label><textarea id="brief" maxlength="3000" placeholder="What needs to be done?"></textarea>
+          <div class="row">
+            <div><label for="owner">Owner</label><select id="owner"></select></div>
+            <div><label for="priority">Priority</label><select id="priority"></select></div>
+          </div>
+          <div class="row">
+            <div><label for="category">Category</label><select id="category"></select></div>
+            <div><label for="due">Due date</label><input id="due" type="date"></div>
+          </div>
+          <div class="row">
+            <div><label for="effort">Estimate (minutes)</label><input id="effort" type="number" min="0" step="15" placeholder="120"></div>
+            <div><label for="goal">Linked goal</label><select id="goal"><option value="">No goal</option></select></div>
+          </div>
+          <label for="theme">Theme / pillar</label><input id="theme" maxlength="160" placeholder="e.g. Understanding substitutes">
+          <button class="primary" type="submit" style="margin-top:14px;width:100%">Create task</button>
+        </form>
+      </div>
+      <div class="panel"><div class="topline"><h2>Task board</h2><select id="filter" onchange="renderTasks()" style="max-width:200px"><option value="">All statuses</option></select></div><div id="taskList"><div class="empty">Loading tasks…</div></div></div>
+    </div>
+  </section>
+  <section id="goalsView" class="hidden"><div class="panel"><h2>Goals</h2><div id="goalList"></div>
+    <div id="goalCreator" class="hidden"><hr><h2>Create a goal</h2><form id="goalForm" onsubmit="submitGoal(event)">
+      <label for="goalTitle">Goal title *</label><input id="goalTitle" required maxlength="160">
+      <div class="row"><div><label for="metricKey">Metric key</label><input id="metricKey" placeholder="published_creatives"></div><div><label for="unit">Unit</label><input id="unit" placeholder="count, %, INR"></div></div>
+      <div class="row"><div><label for="baseline">Baseline</label><input id="baseline" type="number" step="any"></div><div><label for="target">Target</label><input id="target" type="number" step="any"></div></div>
+      <div class="row"><div><label for="current">Current actual</label><input id="current" type="number" step="any"></div><div><label for="direction">Success direction</label><select id="direction"><option value="higher">Higher is better</option><option value="lower">Lower is better</option></select></div></div>
+      <div class="row"><div><label for="goalStart">Start date</label><input id="goalStart" type="date"></div><div><label for="goalEnd">End date</label><input id="goalEnd" type="date"></div></div>
+      <label for="source">Measurement source</label><input id="source" placeholder="Analytics export / manual entry">
+      <button class="primary" style="margin-top:12px">Create goal</button>
+    </form></div>
+  </div></section>
+  <section id="creativesView" class="hidden">
+    <div class="layout">
+      <div class="panel"><h2>Create creative item</h2>
+        <form id="creativeForm" onsubmit="submitCreative(event)">
+          <label for="creativeTask">Linked task *</label><select id="creativeTask" required></select>
+          <label for="creativeTitle">Creative title *</label><input id="creativeTitle" maxlength="160" required placeholder="e.g. How substitute verification works">
+          <div class="row"><div><label for="creativePlatform">Platform *</label><select id="creativePlatform" required><option>Instagram</option><option>Facebook</option><option>WhatsApp</option><option>YouTube</option><option>Offline</option><option>Website</option></select></div>
+          <div><label for="creativeFormat">Format *</label><select id="creativeFormat" required><option>Carousel</option><option>Reel / Short video</option><option>Static post</option><option>Story</option><option>Ad creative</option><option>Poster / Flyer</option><option>Article</option></select></div></div>
+          <p class="muted">Medical, safety, efficacy, quality, substitute-equivalence and savings claims require human review.</p>
+          <button class="primary" style="margin-top:12px;width:100%">Create creative</button>
+        </form>
+      </div>
+      <div class="panel"><h2>Creative pipeline</h2><div id="creativeList"><div class="empty">Loading creatives…</div></div></div>
+    </div>
+  </section>
+  <section id="approvalsView" class="hidden"><div class="panel"><h2>Pending completion approvals</h2><div id="approvalList"></div></div></section>
+  <p class="muted" style="font-size:12px;margin-top:18px">Current build: tasks, goals, approvals and creative workflow. Calendar capacity planning, performance imports and research integrations remain future phases.</p>
+</main>
+<script>
+let DATA = null;
+function callServer(fn, ...args) {
+  return new Promise((resolve,reject) => {
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(e => reject(new Error(e && e.message ? e.message : String(e))))[fn](...args);
+  });
+}
+function msg(text, good=false) {
+  const el=document.getElementById('message');
+  el.className=text?(good?'success':'notice'):'';
+  el.textContent=text||'';
+  if(text) setTimeout(()=>{if(el.textContent===text){el.textContent='';el.className='';}},6000);
+}
+function escapeHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function refresh() {
+  try {
+    DATA=await callServer('getBootstrapData');
+    document.getElementById('userBadge').textContent=DATA.user.name+' · '+DATA.user.role;
+    document.getElementById('greeting').textContent='Welcome, '+DATA.user.name;
+    document.getElementById('approvalTab').classList.toggle('hidden',DATA.user.role!=='admin');
+    document.getElementById('goalCreator').classList.toggle('hidden',DATA.user.role!=='admin');
+    const ownerSel=document.getElementById('owner');
+    if(DATA.user.role==='admin') {
+      ownerSel.innerHTML=DATA.team.map(u=>`<option value="${escapeHtml(u.email)}">${escapeHtml(u.name)} · ${escapeHtml(u.role)}</option>`).join('');
+    } else {
+      ownerSel.innerHTML=`<option value="${escapeHtml(DATA.user.email)}">${escapeHtml(DATA.user.name)}</option>`;
+    }
+    fillSimple('priority',DATA.priorities);
+    fillSimple('category',DATA.categories);
+    const filter=document.getElementById('filter'); const old=filter.value;
+    filter.innerHTML='<option value="">All statuses</option>'+DATA.statuses.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
+    filter.value=old;
+    const goalSel=document.getElementById('goal');
+    goalSel.innerHTML='<option value="">No goal</option>'+DATA.goals.map(g=>`<option value="${escapeHtml(g.goal_id)}">${escapeHtml(g.title)}</option>`).join('');
+    const creativeTask=document.getElementById('creativeTask');
+    creativeTask.innerHTML=DATA.tasks.filter(t=>t.status!=='Completed').map(t=>`<option value="${escapeHtml(t.task_id)}">${escapeHtml(t.title)} · ${escapeHtml(t.owner_email||'')}</option>`).join('');
+    renderStats();renderTasks();renderGoals();renderApprovals();renderCreatives();
+  } catch(e) { msg(e.message); document.getElementById('taskList').innerHTML='<div class="empty">Access/setup error. See the message above.</div>'; }
+}
+function getTeamFromTasks(){return DATA.tasks.map(t=>({email:t.owner_email,name:t.owner_email})).filter(x=>x.email);}
+function fillSelect(id,items,valueKey,labelKey){document.getElementById(id).innerHTML=items.map(x=>`<option value="${escapeHtml(x[valueKey])}">${escapeHtml(x[labelKey])}</option>`).join('');}
+function fillSimple(id,items){document.getElementById(id).innerHTML=items.map(x=>`<option>${escapeHtml(x)}</option>`).join('');}
+function renderStats(){
+  const tasks=DATA.tasks, today=new Date().toISOString().slice(0,10);
+  document.getElementById('openCount').textContent=tasks.filter(t=>t.status!=='Completed').length;
+  document.getElementById('overdueCount').textContent=tasks.filter(t=>t.status!=='Completed'&&t.due_date&&String(t.due_date).slice(0,10)<today).length;
+  document.getElementById('approvalCount').textContent=DATA.approvals.length;
+  document.getElementById('goalCount').textContent=DATA.goals.length;
+}
+function renderTasks(){
+  if(!DATA)return;
+  const filter=document.getElementById('filter').value;
+  let tasks=DATA.tasks.filter(t=>!filter||t.status===filter);
+  if(DATA.user.role!=='admin') tasks=tasks.filter(t=>t.owner_email===DATA.user.email);
+  const list=document.getElementById('taskList');
+  if(!tasks.length){list.innerHTML='<div class="empty">No tasks here yet. Create one to get started.</div>';return;}
+  list.innerHTML=tasks.map(t=>{
+    const canEdit=DATA.user.role==='admin'||t.owner_email===DATA.user.email;
+    const options=DATA.statuses.filter(s=>!['Completed','Completion Requested'].includes(s)).map(s=>`<option ${t.status===s?'selected':''}>${escapeHtml(s)}</option>`).join('');
+    return `<article class="task"><div class="tasktop"><div><h3>${escapeHtml(t.title)}</h3><small>${escapeHtml(t.task_id)} · Owner: ${escapeHtml(t.owner_email||'Unassigned')}</small></div><span class="pill">${escapeHtml(t.priority)}</span></div>
+      <div>${escapeHtml(t.brief||'No brief added.')}</div><div><span class="pill">${escapeHtml(t.status)}</span><span class="pill">${escapeHtml(t.category)}</span>${t.due_date?`<span class="pill">Due ${escapeHtml(String(t.due_date).slice(0,10))}</span>`:''}</div>
+      ${t.blocker_reason?`<p class="danger">Blocked: ${escapeHtml(t.blocker_reason)}</p>`:''}
+      ${canEdit&&t.status!=='Completed'&&t.status!=='Completion Requested'?`<label>Update status</label><div class="actions"><select id="status-${escapeHtml(t.task_id)}">${options}</select><button onclick="changeStatus('${escapeHtml(t.task_id)}')">Save status</button><button class="primary" onclick="requestDone('${escapeHtml(t.task_id)}')">Request completion</button></div>`:''}
+      ${t.status==='Completion Requested'?'<p class="muted">Awaiting admin approval.</p>':''}
+    </article>`;
+  }).join('');
+}
+function renderGoals(){
+  const list=document.getElementById('goalList');
+  if(!DATA.goals.length){list.innerHTML='<div class="empty">No goals yet.</div>';return;}
+  list.innerHTML=DATA.goals.map(g=>{
+    const base=Number(g.baseline_value),target=Number(g.target_value),cur=Number(g.current_value);
+    let pct=0;
+    if(Number.isFinite(base)&&Number.isFinite(target)&&Number.isFinite(cur)&&target!==base){
+      pct=g.direction==='lower'?(base-cur)/(base-target)*100:(cur-base)/(target-base)*100;
+      pct=Math.max(0,Math.min(100,pct));
+    }
+    return `<article class="task"><h3>${escapeHtml(g.title)}</h3><div class="muted">${escapeHtml(g.metric_key||'Metric not specified')} · ${escapeHtml(g.measurement_source||'Source not specified')}</div><p>Outcome progress: <strong>${Math.round(pct)}%</strong> (${escapeHtml(g.current_value||0)} / ${escapeHtml(g.target_value||'—')} ${escapeHtml(g.unit||'')})</p><div style="height:8px;background:#e5ebef;border-radius:9px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#244b63"></div></div></article>`;
+  }).join('');
+}
+function renderApprovals(){
+  const list=document.getElementById('approvalList');
+  if(DATA.user.role!=='admin'){list.innerHTML='<div class="empty">Admin access required.</div>';return;}
+  if(!DATA.approvals.length){list.innerHTML='<div class="empty">No pending approvals.</div>';return;}
+  list.innerHTML=DATA.approvals.map(a=>{
+    const t=DATA.tasks.find(x=>x.task_id===a.task_id)||{};
+    return `<div class="approval"><strong>${escapeHtml(t.title||a.task_id)}</strong><p class="muted">Requested by ${escapeHtml(a.requested_by)} · ${escapeHtml(a.task_id)}</p><label for="comment-${escapeHtml(a.approval_id)}">Review comment</label><input id="comment-${escapeHtml(a.approval_id)}" placeholder="Optional feedback"><div class="actions" style="margin-top:10px"><button class="primary" onclick="decide('${escapeHtml(a.approval_id)}','approved')">Approve completion</button><button onclick="decide('${escapeHtml(a.approval_id)}','rejected')">Reject / return for review</button></div></div>`;
+  }).join('');
+}
+async function submitTask(e){
+  e.preventDefault();
+  const b=e.submitter;b.disabled=true;
+  try{
+    await callServer('createTask',{title:document.getElementById('title').value,brief:document.getElementById('brief').value,
+      owner_email:document.getElementById('owner').value,priority:document.getElementById('priority').value,
+      category:document.getElementById('category').value,due_date:document.getElementById('due').value,
+      estimate_minutes:document.getElementById('effort').value,goal_id:document.getElementById('goal').value,
+      theme:document.getElementById('theme').value});
+    e.target.reset();msg('Task created and saved to Google Sheets.',true);await refresh();
+  }catch(err){msg(err.message)}finally{b.disabled=false}
+}
+async function changeStatus(id){
+  try{await callServer('updateTaskStatus',id,document.getElementById('status-'+id).value);msg('Task status saved.',true);await refresh()}catch(e){msg(e.message)}
+}
+async function requestDone(id){
+  if(!confirm('Request completion approval for this task?'))return;
+  try{await callServer('requestCompletion',id);msg('Completion request sent to admins.',true);await refresh()}catch(e){msg(e.message)}
+}
+async function decide(id,decision){
+  const comments=document.getElementById('comment-'+id).value;
+  try{await callServer('decideCompletion',id,decision,comments);msg('Approval decision saved.',true);await refresh()}catch(e){msg(e.message)}
+}
+const CREATIVE_STAGES=['Ideation','Scripting / Brief','Admin Review','Storyboard','Asset Creation / Editing','Final Admin Review','Ready to Publish','Published','Performance Review','Learning Recorded','Blocked'];
+function renderCreatives(){
+  const list=document.getElementById('creativeList'); if(!DATA)return;
+  if(!DATA.creatives || !DATA.creatives.length){list.innerHTML='<div class="empty">No creative items yet. Create one from a linked task.</div>';return;}
+  list.innerHTML=DATA.creatives.map(c=>{
+    const linked=DATA.tasks.find(t=>t.task_id===c.task_id)||{};
+    const canApprove=DATA.user.role==='admin';
+    const stageOpts=CREATIVE_STAGES.map(s=>`<option ${c.workflow_stage===s?'selected':''}>${escapeHtml(s)}</option>`).join('');
+    const reviewOpts=['not_started','pending','approved','rejected'].map(s=>`<option ${String(c.medical_review_status)===s?'selected':''}>${s}</option>`).join('');
+    return `<article class="task"><div class="tasktop"><div><h3>${escapeHtml(c.title)}</h3><small>${escapeHtml(c.platform)} · ${escapeHtml(c.format)} · Linked task: ${escapeHtml(linked.title||c.task_id)}</small></div><span class="pill">${escapeHtml(c.workflow_stage)}</span></div>
+      <label>Workflow stage</label><select id="creative-stage-${escapeHtml(c.creative_id)}">${stageOpts}</select>
+      <label>Medical / claims review</label><select id="creative-review-${escapeHtml(c.creative_id)}" ${canApprove?'':'disabled'}>${reviewOpts}</select>
+      <label>Published URL (required to mark Published)</label><input id="creative-url-${escapeHtml(c.creative_id)}" type="url" placeholder="https://…" value="${escapeHtml(c.publish_url||'')}">
+      <div class="muted">Review required: ${String(c.medical_review_required)==='true'?'Yes':'No'} · Review status: ${escapeHtml(c.medical_review_status||'not_started')}</div>
+      <div class="actions" style="margin-top:10px"><button class="primary" onclick="saveCreative('${escapeHtml(c.creative_id)}')">Save workflow</button>${c.publish_url?`<a href="${escapeHtml(c.publish_url)}" target="_blank" rel="noopener">Open published asset ↗</a>`:''}</div>
+    </article>`;
+  }).join('');
+}
+async function submitCreative(e){
+  e.preventDefault(); const b=e.submitter; b.disabled=true;
+  try{
+    await callServer('createCreative',{task_id:document.getElementById('creativeTask').value,title:document.getElementById('creativeTitle').value,platform:document.getElementById('creativePlatform').value,format:document.getElementById('creativeFormat').value});
+    e.target.reset(); msg('Creative item saved to Google Sheets.',true); await refresh();
+  }catch(err){msg(err.message)}finally{b.disabled=false}
+}
+async function saveCreative(id){
+  try{
+    await callServer('updateCreativeWorkflow',id,document.getElementById('creative-stage-'+id).value,DATA.user.role==='admin'?document.getElementById('creative-review-'+id).value:'',document.getElementById('creative-url-'+id).value);
+    msg('Creative workflow saved.',true); await refresh();
+  }catch(err){msg(err.message)}
+}
+
+async function submitGoal(e){
+  e.preventDefault();const b=e.submitter;b.disabled=true;
+  try{
+    await callServer('createGoal',{title:document.getElementById('goalTitle').value,metric_key:document.getElementById('metricKey').value,
+      unit:document.getElementById('unit').value,baseline_value:document.getElementById('baseline').value,
+      target_value:document.getElementById('target').value,current_value:document.getElementById('current').value,
+      direction:document.getElementById('direction').value,start_date:document.getElementById('goalStart').value,
+      end_date:document.getElementById('goalEnd').value,measurement_source:document.getElementById('source').value});
+    e.target.reset();msg('Goal created and saved.',true);await refresh()
+  }catch(err){msg(err.message)}finally{b.disabled=false}
+}
+function showView(view){
+  ['tasks','goals','creatives','approvals'].forEach(v=>document.getElementById(v+'View').classList.toggle('hidden',v!==view));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+}
+refresh();
+</script>
+</body>
+</html>
