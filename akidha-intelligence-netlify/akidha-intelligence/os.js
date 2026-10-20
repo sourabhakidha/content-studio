@@ -18,17 +18,13 @@
       {type:"Creative recommendation", title:"Explain the verification process before discussing savings", detail:"Test a process-led carousel against a savings-led opening. Measure qualified inquiries, not reach alone.", source:"Akidha strategy · recommendation"},
       {type:"Compliance watch", title:"Medical and comparative claims need evidence", detail:"Flag safety, efficacy, quality, equivalence and savings claims for evidence and human review.", source:"Brand guardrails · review required"}
     ],
-    goals: [
-      {name:"Qualified WhatsApp inquiries", actual:34, target:50, unit:"inquiries"},
-      {name:"Cost per qualified lead", actual:420, target:350, unit:"₹"},
-      {name:"Approved education creatives", actual:7, target:12, unit:"creatives"}
-    ],
+    goals: [],
     learnings: [], view:"command"
   };
   let state;
   try { state = Object.assign({}, seed, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (_) { state = seed; }
   state.tasks = state.tasks || seed.tasks; state.tasks.forEach(t=>{if(t.owner==="Sai")t.owner="Saail";}); state.intelligence = state.intelligence || seed.intelligence;
-  state.goals = state.goals || seed.goals; state.learnings = state.learnings || [];
+  state.goals = state.goals || []; if (state.goals.some(g => "actual" in g || "target" in g)) state.goals = []; state.learnings = state.learnings || [];
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const save = () => localStorage.setItem(KEY, JSON.stringify(state));
   const fmt = s => new Date(s + "T12:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short"});
@@ -47,7 +43,7 @@
       [["execution","Workspace","▦"],["creative","Content opportunities","✳"],["research","Content radar","↗"],["intelligence","AI intelligence","✧"],["calendar","Calendar","▤"]].map(x => '<button class="nav-item os-nav-item" data-os-view="' + x[0] + '"><span class="nav-icon">'+x[2]+'</span>' + x[1] + '</button>').join("");
     nav.after(group);
     const section = document.createElement("section"); section.id = "os-workspace"; section.className = "view";
-    section.innerHTML = '<div class="os-hero"><div><div class="eyebrow">AKIDHA · MARKETING OPERATING SYSTEM</div><h1 id="os-title">Workspace</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New task</button></div><div id="os-content"></div><div class="os-modal-backdrop" id="os-task-modal" hidden><section class="os-modal" role="dialog" aria-modal="true" aria-labelledby="os-task-modal-title"><div class="os-modal-head"><div><div class="eyebrow">WORK MANAGEMENT</div><h2 id="os-task-modal-title">Create a task</h2><p>Give the work a clear owner and next step.</p></div><button type="button" class="os-modal-close" id="os-task-close" aria-label="Close">×</button></div><form id="os-task-form" class="os-task-form"><label>Task title<input name="title" required maxlength="140" placeholder="e.g. Draft substitute-trust carousel"></label><div class="os-form-grid"><label>Owner<select name="owner"><option>Saurabh</option><option>Tanvi</option><option>Nikita</option><option>Saail</option></select></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label><label>Due date<input type="date" name="due" required value="' + plusDays(2) + '"></label><label>Task type<select name="pillar"><option>Content</option><option>Research</option><option>Design & video</option><option>Review / approval</option><option>Operations</option></select></label></div><label>Work document link <span class="os-optional">Optional</span><input name="doc" type="url" placeholder="https://docs.google.com/..."></label><div class="os-modal-actions"><button type="button" class="button button-secondary" id="os-task-cancel">Cancel</button><button type="submit" class="button button-primary">Create task</button></div></form></section></div>';
+    section.innerHTML = '<div class="os-hero"><div><div class="eyebrow">AKIDHA · MARKETING OPERATING SYSTEM</div><h1 id="os-title">Workspace</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New activity</button></div><div id="os-content"></div><div class="os-modal-backdrop" id="os-task-modal" hidden><section class="os-modal" role="dialog" aria-modal="true" aria-labelledby="os-task-modal-title"><div class="os-modal-head"><div><div class="eyebrow">WORK MANAGEMENT</div><h2 id="os-task-modal-title">New activity</h2><p>Create a specific task or a larger goal. Tasks can contribute to goals.</p></div><button type="button" class="os-modal-close" id="os-task-close" aria-label="Close">×</button></div><form id="os-task-form" class="os-task-form"><label>Activity type<select name="activityType" id="os-activity-type"><option value="task">Task — specific piece of work</option><option value="goal">Goal — larger outcome</option></select></label><div id="os-task-fields"><label>Task title<input name="title" required maxlength="140" placeholder="e.g. Write script 1 of the weekly batch"></label><div class="os-form-grid"><label>Owner<select name="owner"><option>Saurabh</option><option>Tanvi</option><option>Nikita</option><option>Saail</option></select></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label><label>Due date<input type="date" name="due" required value="' + plusDays(2) + '"></label><label>Task type<select name="pillar"><option>Content</option><option>Research</option><option>Design & video</option><option>Review / approval</option><option>Operations</option></select></label></div><label>Contributes to goal<select name="goalId" id="os-task-goal"><option value="">No linked goal</option></select></label><label>Work document link <span class="os-optional">Optional</span><input name="doc" type="url" placeholder="https://docs.google.com/..."></label></div><div id="os-goal-fields" hidden><label>Goal title<input name="goalTitle" maxlength="140" placeholder="e.g. Complete five scripts this week"></label><label>What outcome defines success?<textarea name="goalDescription" rows="3" placeholder="Describe the larger outcome, not the individual tasks."></textarea></label><div class="os-form-grid"><label>Owner<select name="goalOwner"><option>Saurabh</option><option>Tanvi</option><option>Nikita</option><option>Saail</option></select></label><label>Target date<input type="date" name="goalDue" value="' + plusDays(7) + '"></label><label>Target quantity <span class="os-optional">Optional</span><input type="number" min="1" name="goalTarget" placeholder="5"></label><label>Unit <span class="os-optional">Optional</span><input name="goalUnit" placeholder="scripts"></label></div></div><div class="os-modal-actions"><button type="button" class="button button-secondary" id="os-task-cancel">Cancel</button><button type="submit" class="button button-primary" id="os-activity-submit">Create task</button></div></form></section></div>';
     main.append(section);
     $$("[data-os-view]").forEach(b => b.addEventListener("click", () => show(b.dataset.osView)));
     $("#os-new-task").addEventListener("click", newTask);
@@ -92,17 +88,15 @@
       '<p class="signal-meta">Planned sources: Reddit threads and comments, public social posts where accessible, Google Trends/search interest, Indian government and regulator updates, and reputable Indian healthcare/pharma news. Every item should retain source URL, published date, collection date and an evidence/interpretation label.</p>';
   }
   function goals() {
-    return '<div class="notice"><span class="notice-icon">◎</span><div><b>Goals are outcomes, not tasks</b><span>Track the result you want to achieve here. Workspace tasks are the activities that may contribute to these outcomes.</span></div></div>'+
-      '<div class="stats-grid">'+state.goals.map(g=>'<article class="stat-card"><div class="stat-top"><span>'+esc(g.name)+'</span><span class="stat-icon sage">◎</span></div><div class="stat-number">'+g.actual+' <span style="font-size:13px;color:#8a968e">/ '+g.target+'</span></div><div class="stat-caption">'+esc(g.unit)+' · current / target</div><div style="height:7px;background:#e8ebe4;border-radius:8px;margin-top:14px"><div style="height:100%;width:'+Math.min(100,Math.round(g.actual/g.target*100))+'%;background:#64836e;border-radius:8px"></div></div></article>').join("")+'</div>'+
-      panel("Goal-setting principles",'<ul><li>Each goal has an outcome, baseline, target, time period and accountable owner.</li><li>Tasks are linked to goals; tasks do not replace the goal itself.</li><li>Use verified performance data, not illustrative numbers, for business decisions.</li></ul>')+
-      '<p class="signal-meta">These goal figures are existing example records. Connect the real source of truth before using them for decisions.</p>';
+    const cards=state.goals.map(g=>{const linked=state.tasks.filter(t=>t.goalId===g.id);const done=linked.filter(t=>t.status==="Done").length;return '<article class="goal-card"><div class="goal-card-top"><span class="goal-dot"></span><span class="tag">GOAL</span></div><h3>'+esc(g.title||g.name)+'</h3><p>'+esc(g.description||"Outcome to be achieved through linked tasks.")+'</p><div class="goal-metric">'+linked.length+' <span>linked tasks · '+done+' completed</span></div><div class="goal-progress"><span style="width:'+(linked.length?Math.round(done/linked.length*100):0)+'%"></span></div><div class="goal-meta"><span>Owner: '+esc(g.owner||"Unassigned")+'</span><span>Target: '+esc(g.due||"Not set")+'</span></div><button class="mini-link" data-goal-link="'+esc(g.id)+'">＋ Add task to this goal</button></article>';}).join("");
+    return '<div class="notice"><span class="notice-icon">◎</span><div><b>Goals define the larger outcome</b><span>Example: complete five scripts this week. Create specific tasks and link them to that goal; progress reflects completed linked tasks.</span></div></div><div class="workspace-section-head"><div><h2>Your goals</h2><p>No invented KPIs. Goals are created by your team.</p></div><button class="button button-primary" id="os-goal-add">＋ New activity</button></div><div class="goal-grid">'+(cards||'<div class="empty-state"><h3>No goals created yet</h3><p>Create a goal such as “Complete five scripts this week”, then link the individual tasks needed to achieve it.</p></div>')+'</div>';
   }
   function creative() {
     const pillars=[["Medicine education","Explain labels, molecules and questions to ask a clinician.","Instagram carousel / YouTube explainer"],["Trust & process transparency","Show what doctor verification and pharmacist review mean in practice.","Reel / Facebook explainer"],["Caregiver support","Help families organize prescriptions, refills and questions.","Checklist / regional-language video"],["Objection handling","Address quality concerns calmly with evidence and clear limitations.","FAQ / short video"]];
     return '<div class="focus-grid">'+pillars.map(p=>'<article class="focus-card"><span class="tag">CONTENT PILLAR</span><h3>'+p[0]+'</h3><p>'+p[1]+'</p><div class="card-bottom"><span class="audience">'+p[2]+'</span><button class="mini-link" data-pillar="'+esc(p[0])+'">Create brief →</button></div></article>').join("")+'</div>'+panel("Creative test standards",'<ul><li>Match the concept to a real audience concern, not a generic trend.</li><li>Adapt content to each platform instead of copying one post everywhere.</li><li>Record audience, hook, format, CTA, hypothesis, metric and result.</li><li>Require evidence and human review for medical, quality and comparative claims.</li></ul>');
   }
   function execution() {
-    return '<div class="workspace-summary">'+[['Open tasks',state.tasks.filter(t=>t.status!=="Done").length],['In progress',state.tasks.filter(t=>t.status==="In progress").length],['Awaiting review',state.tasks.filter(t=>["In review","Awaiting approval"].includes(t.status)).length],['Goals',state.goals.length]].map(x=>'<article class="stat-card"><div class="stat-caption">'+x[0]+'</div><div class="stat-number">'+x[1]+'</div></article>').join("")+'</div><div class="workspace-section-head"><div><h2>Tasks</h2><p>Execution and approvals stay separate from goal outcomes.</p></div><button id="os-task-add" class="button button-primary">＋ New task</button></div><div class="toolbar"><button id="os-board" class="button button-secondary">Board view</button><input id="os-task-filter" class="search-input" placeholder="Search tasks or owners"></div><div id="os-task-view"></div><div class="workspace-section-head goals-heading"><div><h2>Goals</h2><p>Track outcomes independently; link tasks to the outcomes they support.</p></div></div><div class="goal-grid">'+state.goals.map((g,i)=>'<article class="goal-card"><div class="goal-card-top"><span class="goal-dot"></span><span class="tag">'+(i===0?'Growth':i===1?'Efficiency':'Output')+'</span></div><h3>'+esc(g.name)+'</h3><div class="goal-metric">'+g.actual+' <span>/ '+g.target+' '+esc(g.unit)+'</span></div><div class="goal-progress"><span style="width:'+Math.min(100,Math.round(g.actual/g.target*100))+'%"></span></div><p>Illustrative baseline — connect verified data before making decisions.</p></article>').join("")+'</div>'+panel("Approval workflow",'<p>Contributors submit work for review. Only authorised admins approve completion; medical and comparative claims require evidence and human review.</p>');
+    return '<div class="workspace-summary">'+[['Open tasks',state.tasks.filter(t=>t.status!=="Done").length],['In progress',state.tasks.filter(t=>t.status==="In progress").length],['Awaiting review',state.tasks.filter(t=>["In review","Awaiting approval"].includes(t.status)).length],['Goals',state.goals.length]].map(x=>'<article class="stat-card"><div class="stat-caption">'+x[0]+'</div><div class="stat-number">'+x[1]+'</div></article>').join("")+'</div><div class="workspace-section-head"><div><h2>Tasks</h2><p>Specific work items. Link each task to a larger goal where relevant.</p></div></div><div class="toolbar"><button id="os-board" class="button button-secondary">Board view</button><input id="os-task-filter" class="search-input" placeholder="Search tasks or owners"></div><div id="os-task-view"></div>'+panel("How work connects",'<p><b>Goal:</b> Complete five scripts this week. <b>Tasks:</b> research audience questions, outline scripts, write each script, review and approve. Mark tasks done to track progress toward the goal.</p>');
   }
   function board() {
     const statuses=["To do","In progress","In review","Awaiting approval","Done"];
@@ -120,35 +114,50 @@
   function learning() {
     return '<div class="notice"><span class="notice-icon">↻</span><div><b>Close the loop</b><span>Every campaign should leave behind a documented learning, not just a metric screenshot.</span></div></div><form id="os-learning-form" class="panel" style="display:grid;gap:12px"><label>Campaign / creative<input required name="campaign" class="search-input" placeholder="e.g. Substitute trust carousel"></label><label>Observed result<textarea required name="observation" class="search-input" rows="3" placeholder="Metric, period and source"></textarea></label><label>Interpretation / hypothesis<textarea name="hypothesis" class="search-input" rows="3" placeholder="What might explain it? Mark uncertainty clearly."></textarea></label><label>Next test<textarea name="next" class="search-input" rows="2" placeholder="What will we test next?"></textarea></label><button class="button button-primary">Save learning record</button></form>'+panel("Recorded learnings",state.learnings.length?state.learnings.map(l=>'<div class="signal-row"><div class="signal-copy"><h4>'+esc(l.campaign)+'</h4><p><b>Observation:</b> '+esc(l.observation)+'</p><p><b>Hypothesis:</b> '+esc(l.hypothesis||"Not recorded")+'</p><p><b>Next test:</b> '+esc(l.next||"Not recorded")+'</p></div></div>').join(""):"<p>No learning records yet.</p>");
   }
+  function populateGoalOptions() {
+    const select=$("#os-task-goal"); if(!select)return;
+    const current=select.value;
+    select.innerHTML='<option value="">No linked goal</option>'+state.goals.map(g=>'<option value="'+esc(g.id)+'">'+esc(g.title||g.name)+'</option>').join("");
+    if(state.goals.some(g=>g.id===current))select.value=current;
+  }
+  function syncActivityType() {
+    const type=$("#os-activity-type").value, isGoal=type==="goal";
+    $("#os-task-fields").hidden=isGoal; $("#os-goal-fields").hidden=!isGoal;
+    $("#os-task-modal-title").textContent=isGoal?"Create a goal":"Create a task";
+    $("#os-activity-submit").textContent=isGoal?"Create goal":"Create task";
+    $('[name="title"]').required=!isGoal; $('[name="goalTitle"]').required=isGoal;
+    $('[name="due"]').required=!isGoal; $('[name="goalDue"]').required=isGoal;
+  }
   function newTask() {
-    const modal = $("#os-task-modal");
-    if (!modal) return;
+    const modal=$("#os-task-modal"); if(!modal)return;
     $("#os-task-form").reset();
-    $('[name="due"]', modal).value = plusDays(2);
-    modal.hidden = false;
-    document.body.classList.add("os-modal-open");
-    setTimeout(() => $('[name="title"]', modal).focus(), 30);
+    $('[name="due"]',modal).value=plusDays(2); $('[name="goalDue"]',modal).value=plusDays(7);
+    populateGoalOptions(); $("#os-activity-type").value="task"; syncActivityType();
+    modal.hidden=false; document.body.classList.add("os-modal-open");
+    setTimeout(()=>$('[name="title"]',modal).focus(),30);
   }
   function closeTaskModal() {
-    const modal = $("#os-task-modal");
-    if (modal) modal.hidden = true;
+    const modal=$("#os-task-modal"); if(modal)modal.hidden=true;
     document.body.classList.remove("os-modal-open");
   }
   function saveNewTask(e) {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    const title = String(data.title || "").trim();
-    if (!title) return;
-    state.tasks.unshift({id:"t"+Date.now(),title,owner:data.owner || "Nikita",status:"To do",priority:data.priority || "Medium",due:data.due || plusDays(2),pillar:data.pillar || "General",doc:data.doc || ""});
-    save();
-    closeTaskModal();
-    show("execution");
+    const data=Object.fromEntries(new FormData(e.currentTarget));
+    if(data.activityType==="goal"){
+      const title=String(data.goalTitle||"").trim(); if(!title)return;
+      state.goals.unshift({id:"g"+Date.now(),title,description:String(data.goalDescription||"").trim(),owner:data.goalOwner||"Saurabh",due:data.goalDue||plusDays(7),target:Number(data.goalTarget)||null,unit:String(data.goalUnit||"").trim(),createdAt:plusDays(0)});
+    } else {
+      const title=String(data.title||"").trim(); if(!title)return;
+      state.tasks.unshift({id:"t"+Date.now(),title,owner:data.owner||"Nikita",status:"To do",priority:data.priority||"Medium",due:data.due||plusDays(2),pillar:data.pillar||"Content",goalId:data.goalId||"",doc:data.doc||""});
+    }
+    save(); closeTaskModal(); show("execution");
   }
   function render() {
     const c=$("#os-content"); if(!c)return; const v=state.view||"execution";
     c.innerHTML=({intelligence,research,creative,execution,calendar})[v]();
-    if(v==="execution"){ $("#os-board").onclick=board;$("#os-task-add").onclick=newTask;board(); const f=$("#os-task-filter"); if(f) f.oninput=()=>{const q=f.value.toLowerCase();$("[data-status]").forEach(()=>{});const all=state.tasks;state.tasks=all.filter(t=>(t.title+" "+t.owner+" "+t.pillar).toLowerCase().includes(q));board();state.tasks=all;}; }
+    if(v==="execution"){ $("#os-board").onclick=board;board(); const f=$("#os-task-filter"); if(f) f.oninput=()=>{const q=f.value.toLowerCase();$("[data-status]").forEach(()=>{});const all=state.tasks;state.tasks=all.filter(t=>(t.title+" "+t.owner+" "+t.pillar).toLowerCase().includes(q));board();state.tasks=all;}; }
     if(v==="calendar") calendar();
+    if(v==="execution"){const goalBtn=$("#os-goal-add");if(goalBtn)goalBtn.onclick=()=>{newTask();$("#os-activity-type").value="goal";syncActivityType();};populateGoalOptions();}
     if(v==="research") { $("[data-radar-tab]").forEach(b=>b.onclick=()=>{ $("[data-radar-tab]").forEach(x=>x.className="button button-secondary"); b.className="button button-primary"; const q=$("#os-research-query").value.trim(); $("#os-radar-results").innerHTML='<div class="panel"><div class="panel-heading"><div><h3>'+esc(b.textContent)+' queue</h3><p>'+(q?'Topic: '+esc(q):'Choose a topic to build a focused collection brief.')+'</p></div></div><p>Live collection is not connected yet. Use “Create research brief” to save the question for source-led research.</p></div>'; }); }
     if(v==="learning")$("#os-learning-form").addEventListener("submit",e=>{e.preventDefault();state.learnings.unshift(Object.fromEntries(new FormData(e.target)));save();render();});
     $$("[data-promote]").forEach(b=>b.onclick=()=>{const i=state.intelligence[Number(b.dataset.promote)];state.tasks.unshift({id:"t"+Date.now(),title:i.title,owner:"Saurabh",status:"To do",priority:"Medium",due:plusDays(2),pillar:i.type,doc:""});save();show("execution");});
