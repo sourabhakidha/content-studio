@@ -538,7 +538,7 @@ function getBootstrapData() {
     shifts: APP.SHIFTS,
     team: team,
     tasks: userTasks.sort((a, b) => String(a.due_date || '9999').localeCompare(String(b.due_date || '9999'))),
-    allTasksForSelect: allTasks.map(t => ({ task_id: t.task_id, title: t.title, owner_email: t.owner_email, status: t.status })),
+    allTasksForSelect: userTasks.map(t => ({ task_id: t.task_id, title: t.title, owner_email: t.owner_email, status: t.status })),
     goals: tables.Goals.filter(g => !truthy_(g.is_archived)),
     creatives: userCreatives,
     approvals: pendingApprovals,
@@ -768,7 +768,16 @@ function addTaskDependency(taskId, dependsOnTaskId) {
   const user = Auth.getCurrentUser();
   taskId = clean_(taskId, 80);
   dependsOnTaskId = clean_(dependsOnTaskId, 80);
+  if (!taskId || !dependsOnTaskId) throw new Error('Both task IDs are required.');
   if (taskId === dependsOnTaskId) throw new Error('A task cannot depend on itself.');
+
+  const task = Db.findById('Tasks', 'task_id', taskId);
+  const prerequisite = Db.findById('Tasks', 'task_id', dependsOnTaskId);
+  if (!task || !prerequisite) throw new Error('Task or prerequisite task not found.');
+  Auth.assertCanEditTask(user, task);
+  if (user.role !== 'admin' && cleanEmail_(prerequisite.owner_email) !== user.email) {
+    throw new Error('You can only link tasks you are authorized to access.');
+  }
 
   const allDeps = Db.readObjects('TaskDependencies');
   const exists = allDeps.some(d => d.task_id === taskId && d.depends_on_task_id === dependsOnTaskId);
@@ -781,13 +790,20 @@ function addTaskDependency(taskId, dependsOnTaskId) {
     dependency_type: 'prerequisite',
     created_at: new Date()
   });
-
+  audit_(user.email, 'task_dependency', taskId, 'added', 'Prerequisite: ' + dependsOnTaskId);
   return { ok: true };
 }
 
 function removeTaskDependency(dependencyId) {
-  Auth.getCurrentUser();
-  Db.deleteById('TaskDependencies', 'dependency_id', clean_(dependencyId, 80));
+  const user = Auth.getCurrentUser();
+  dependencyId = clean_(dependencyId, 80);
+  const dependency = Db.findById('TaskDependencies', 'dependency_id', dependencyId);
+  if (!dependency) throw new Error('Task dependency not found.');
+  const task = Db.findById('Tasks', 'task_id', dependency.task_id);
+  if (!task) throw new Error('Task not found.');
+  Auth.assertCanEditTask(user, task);
+  Db.deleteById('TaskDependencies', 'dependency_id', dependencyId);
+  audit_(user.email, 'task_dependency', dependencyId, 'removed', 'Task: ' + dependency.task_id);
   return { ok: true };
 }
 
