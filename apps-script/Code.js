@@ -599,7 +599,9 @@ function createTask(payload) {
     title: title,
     brief: clean_(payload.brief, 3000),
     owner_email: ownerEmail,
-    status: APP.STATUSES.includes(payload.status) ? payload.status : 'Backlog',
+    status: user.role === 'admin' && APP.STATUSES.includes(payload.status)
+      ? payload.status
+      : 'Backlog',
     priority: APP.PRIORITIES.includes(payload.priority) ? payload.priority : 'Medium',
     category: APP.CATEGORIES.includes(payload.category) ? payload.category : 'Other',
     goal_id: clean_(payload.goal_id, 80),
