@@ -533,7 +533,10 @@ function getBootstrapData() {
   const visibleCreativeIds = new Set(userCreatives.map(c => String(c.creative_id)));
   const visibleDependencies = user.role === 'admin'
     ? tables.TaskDependencies
-    : tables.TaskDependencies.filter(d => visibleTaskIds.has(String(d.task_id)));
+    : tables.TaskDependencies.filter(d =>
+        visibleTaskIds.has(String(d.task_id)) &&
+        visibleTaskIds.has(String(d.depends_on_task_id))
+      );
   const visiblePerformance = user.role === 'admin'
     ? tables.Performance
     : tables.Performance.filter(p => visibleCreativeIds.has(String(p.creative_id)));
