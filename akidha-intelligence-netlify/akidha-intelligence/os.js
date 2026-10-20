@@ -97,7 +97,7 @@
   function board() {
     const statuses=["To do","In progress","In review","Awaiting approval","Done"];
     $("#os-task-view").innerHTML='<div class="focus-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">'+statuses.map(s=>'<article class="panel"><h3>'+s+'</h3>'+state.tasks.filter(t=>t.status===s).map(t=>'<div class="focus-card" style="margin-top:10px"><b>'+esc(t.title)+'</b><p>'+esc(t.owner)+' · '+fmt(t.due)+'</p><select class="select-input" data-status="'+t.id+'">'+statuses.map(x=>'<option '+(x===t.status?'selected':'')+'>'+x+'</option>').join("")+'</select>'+(t.doc?'<p><a href="'+esc(t.doc)+'" target="_blank" rel="noopener">Open work ↗</a></p>':'')+'</div>').join("")+'</article>').join("")+'</div>';
-    $$("[data-status]").forEach(s=>s.addEventListener("change",()=>{const t=state.tasks.find(t=>t.id===s.dataset.status);t.status=s.value;save();board();}));
+    $("[data-status]").forEach(s=>s.addEventListener("change",()=>{const t=state.tasks.find(t=>t.id===s.dataset.status);t.status=s.value==="Done"?"Awaiting approval":s.value;save();board();if(s.value==="Done")window.alert("This workspace requires admin approval before a task can be marked Done. The task has been moved to Awaiting approval.");}));
   }
   function calendar() {
     const days=Array.from({length:14},(_,i)=>plusDays(i));
