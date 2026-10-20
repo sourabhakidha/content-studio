@@ -1,0 +1,11 @@
+tests/
+src/
+node_modules/
+akidha-intelligence-netlify/
+*.zip
+package.json
+package-lock.json
+README.md
+.github/
+.env*
+

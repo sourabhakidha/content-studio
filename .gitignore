@@ -1,6 +1,17 @@
-
+# Google Apps Script / Clasp Credentials
 .clasp.json
 .clasprc.json
-node_modules/
 .env
 .env.*
+!.env.example
+*.env
+
+# Dependencies & Testing
+node_modules/
+coverage/
+
+# OS and Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
