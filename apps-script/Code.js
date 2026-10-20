@@ -873,6 +873,9 @@ function submitCreativeForMedicalReview(creativeId, notes) {
   creativeId = clean_(creativeId, 80);
   const creative = Db.findById('Creatives', 'creative_id', creativeId);
   if (!creative) throw new Error('Creative not found.');
+  const linkedTask = Db.findById('Tasks', 'task_id', creative.task_id);
+  if (!linkedTask) throw new Error('Linked task not found.');
+  Auth.assertCanEditTask(user, linkedTask);
 
   Db.updateById('Creatives', 'creative_id', creativeId, {
     medical_review_status: 'pending',
@@ -911,6 +914,9 @@ function updateCreativeWorkflow(creativeId, nextStage, publishUrl, assetDriveUrl
   creativeId = clean_(creativeId, 80);
   const creative = Db.findById('Creatives', 'creative_id', creativeId);
   if (!creative) throw new Error('Creative not found.');
+  const linkedTask = Db.findById('Tasks', 'task_id', creative.task_id);
+  if (!linkedTask) throw new Error('Linked task not found.');
+  Auth.assertCanEditTask(user, linkedTask);
 
   if (!APP.CREATIVE_STAGES.includes(nextStage)) throw new Error('Invalid creative workflow stage.');
 
@@ -1354,6 +1360,7 @@ function callGeminiApi_(apiKey, systemPrompt, userPrompt) {
 
 function recordPerformanceObservation(payload) {
   const user = Auth.getCurrentUser();
+  Auth.requireAdmin(user);
   payload = payload || {};
   const id = newId_('OBS');
   const now = new Date();
