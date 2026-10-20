@@ -1414,12 +1414,21 @@ function recordLearning(payload) {
   const campaign = clean_(payload.campaign_name, 160);
   if (!campaign) throw new Error('Campaign name is required.');
 
+  const creativeId = clean_(payload.creative_id, 80);
+  if (creativeId) {
+    const creative = Db.findById('Creatives', 'creative_id', creativeId);
+    if (!creative) throw new Error('Creative not found.');
+    const linkedTask = Db.findById('Tasks', 'task_id', creative.task_id);
+    if (!linkedTask) throw new Error('Linked task not found.');
+    Auth.assertCanEditTask(user, linkedTask);
+  }
+
   const id = newId_('LRN');
   const now = new Date();
   Db.appendObject('Learnings', {
     learning_id: id,
     campaign_name: campaign,
-    creative_id: clean_(payload.creative_id, 80),
+    creative_id: creativeId,
     observation: clean_(payload.observation, 1000),
     hypothesis: clean_(payload.hypothesis, 1000),
     next_test: clean_(payload.next_test, 1000),
@@ -1437,9 +1446,11 @@ function decideLearning(learningId, decision) {
   const user = Auth.getCurrentUser();
   Auth.requireAdmin(user);
   learningId = clean_(learningId, 80);
+  if (!['approved', 'rejected'].includes(decision)) throw new Error('Invalid learning decision.');
+  if (!Db.findById('Learnings', 'learning_id', learningId)) throw new Error('Learning not found.');
 
   Db.updateById('Learnings', 'learning_id', learningId, {
-    status: decision === 'approved' ? 'approved' : 'rejected',
+    status: decision,
     approved_by: user.email
   });
 
