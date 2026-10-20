@@ -33,24 +33,21 @@
   const save = () => localStorage.setItem(KEY, JSON.stringify(state));
   const fmt = s => new Date(s + "T12:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short"});
   const headings = {
-    command:["Command center","A visual overview of work, goals, deadlines and India-market signals."],
-    execution:["Workspace","Tasks, owners, priorities, approvals and calendar in one execution space."],
-    goals:["Goals","Track outcomes separately from the tasks that contribute to them."],
-    research:["India radar","A source-led view of Reddit, social conversations, trends and news relevant to Indian healthcare and pharma."],
-    intelligence:["AI intelligence","Source-aware recommendations, grounded in brand strategy and measured performance."],
-    creative:["Creative intelligence","Turn audience problems and strategic pillars into platform-native creative tests."],
-    team:["Team workload","Capacity, assignments, overdue work and completed tasks by person."],
-    learning:["Learning loop","Capture results and feed approved lessons into the next planning cycle."]
+    execution:["Workspace","Tasks, goals, owners, priorities, approvals and deadlines in one place."],
+    creative:["Content opportunities","Turn audience needs and strategy into specific, testable content concepts."],
+    research:["Content radar","Reddit, social conversations, trends and Indian healthcare/pharma news."],
+    intelligence:["AI intelligence","Brand-aware analysis and recommendations with evidence and human-review flags."],
+    calendar:["Calendar","A single timeline for tasks, content production and deadlines."]
   };
   function addShell() {
     const nav = $(".nav"), main = $(".main-content");
     if (!nav || !main || $("#os-nav-group")) return;
     const group = document.createElement("div"); group.id = "os-nav-group";
-    group.innerHTML = '<div class="workspace-label" style="margin-top:22px">MARKETING OS</div>' +
-      [["command","Command center"],["execution","Workspace"],["goals","Goals"],["research","India radar"],["intelligence","AI intelligence · later phase"],["creative","Creative intelligence · later phase"],["team","Team workload · later phase"],["learning","Learning loop · later phase"]].map(x => '<button class="nav-item" data-os-view="' + x[0] + '"><span class="nav-icon">◫</span>' + x[1] + '</button>').join("");
+    group.innerHTML = '<div class="workspace-label" style="margin-top:22px">AKIDHA WORKSPACE</div>' +
+      [["execution","Workspace","▦"],["creative","Content opportunities","✳"],["research","Content radar","↗"],["intelligence","AI intelligence","✧"],["calendar","Calendar","▤"]].map(x => '<button class="nav-item os-nav-item" data-os-view="' + x[0] + '"><span class="nav-icon">'+x[2]+'</span>' + x[1] + '</button>').join("");
     nav.after(group);
     const section = document.createElement("section"); section.id = "os-workspace"; section.className = "view";
-    section.innerHTML = '<div class="page-heading"><div><div class="eyebrow">AKIDHA · MARKETING OPERATING SYSTEM</div><h1 id="os-title">Command center</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New task</button></div><div id="os-content"></div><div class="os-modal-backdrop" id="os-task-modal" hidden><section class="os-modal" role="dialog" aria-modal="true" aria-labelledby="os-task-modal-title"><div class="os-modal-head"><div><div class="eyebrow">WORK MANAGEMENT</div><h2 id="os-task-modal-title">Create a task</h2><p>Give the work a clear owner and next step.</p></div><button type="button" class="os-modal-close" id="os-task-close" aria-label="Close">×</button></div><form id="os-task-form" class="os-task-form"><label>Task title<input name="title" required maxlength="140" placeholder="e.g. Draft substitute-trust carousel"></label><div class="os-form-grid"><label>Owner<select name="owner"><option>Nikita</option><option>Sai</option><option>Tanvi</option><option>Saurabh</option></select></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label><label>Due date<input type="date" name="due" required value="' + plusDays(2) + '"></label><label>Workstream<select name="pillar"><option>Medicine education</option><option>Trust & transparency</option><option>Audience intelligence</option><option>Performance learning</option><option>General</option></select></label></div><label>Work document link <span class="os-optional">Optional</span><input name="doc" type="url" placeholder="https://docs.google.com/..."></label><div class="os-modal-actions"><button type="button" class="button button-secondary" id="os-task-cancel">Cancel</button><button type="submit" class="button button-primary">Create task</button></div></form></section></div>';
+    section.innerHTML = '<div class="os-hero"><div><div class="eyebrow">AKIDHA · MARKETING OPERATING SYSTEM</div><h1 id="os-title">Workspace</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New task</button></div><div id="os-content"></div><div class="os-modal-backdrop" id="os-task-modal" hidden><section class="os-modal" role="dialog" aria-modal="true" aria-labelledby="os-task-modal-title"><div class="os-modal-head"><div><div class="eyebrow">WORK MANAGEMENT</div><h2 id="os-task-modal-title">Create a task</h2><p>Give the work a clear owner and next step.</p></div><button type="button" class="os-modal-close" id="os-task-close" aria-label="Close">×</button></div><form id="os-task-form" class="os-task-form"><label>Task title<input name="title" required maxlength="140" placeholder="e.g. Draft substitute-trust carousel"></label><div class="os-form-grid"><label>Owner<select name="owner"><option>Nikita</option><option>Sai</option><option>Tanvi</option><option>Saurabh</option></select></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label><label>Due date<input type="date" name="due" required value="' + plusDays(2) + '"></label><label>Workstream<select name="pillar"><option>Medicine education</option><option>Trust & transparency</option><option>Audience intelligence</option><option>Performance learning</option><option>General</option></select></label></div><label>Work document link <span class="os-optional">Optional</span><input name="doc" type="url" placeholder="https://docs.google.com/..."></label><div class="os-modal-actions"><button type="button" class="button button-secondary" id="os-task-cancel">Cancel</button><button type="submit" class="button button-primary">Create task</button></div></form></section></div>';
     main.append(section);
     $$("[data-os-view]").forEach(b => b.addEventListener("click", () => show(b.dataset.osView)));
     $("#os-new-task").addEventListener("click", newTask);
@@ -59,7 +56,7 @@
     $("#os-task-modal").addEventListener("click", e => { if (e.target.id === "os-task-modal") closeTaskModal(); });
     $("#os-task-form").addEventListener("submit", saveNewTask);
     render();
-    show(state.view || "command");
+    show(["execution","creative","research","intelligence","calendar"].includes(state.view) ? state.view : "execution");
   }
   function show(v) {
     state.view = v; save();
@@ -105,8 +102,7 @@
     return '<div class="focus-grid">'+pillars.map(p=>'<article class="focus-card"><span class="tag">CONTENT PILLAR</span><h3>'+p[0]+'</h3><p>'+p[1]+'</p><div class="card-bottom"><span class="audience">'+p[2]+'</span><button class="mini-link" data-pillar="'+esc(p[0])+'">Create brief →</button></div></article>').join("")+'</div>'+panel("Creative test standards",'<ul><li>Match the concept to a real audience concern, not a generic trend.</li><li>Adapt content to each platform instead of copying one post everywhere.</li><li>Record audience, hook, format, CTA, hypothesis, metric and result.</li><li>Require evidence and human review for medical, quality and comparative claims.</li></ul>');
   }
   function execution() {
-    const statuses=["To do","In progress","In review","Awaiting approval","Done"];
-    return '<div class="toolbar"><button id="os-board" class="button button-secondary">Board</button><button id="os-calendar" class="button button-secondary">Calendar · 14 days</button><button id="os-task-add" class="button button-primary">＋ New task</button></div><div id="os-task-view"></div>'+panel("Approval submissions",'<p>Team members attach Google Docs, Sheets, Word or Excel links when submitting work. Reviewers open the linked file and approve or return the task with feedback. File access follows the original file-sharing permissions.</p>');
+    return '<div class="workspace-summary">'+[['Open tasks',state.tasks.filter(t=>t.status!=="Done").length],['In progress',state.tasks.filter(t=>t.status==="In progress").length],['Awaiting review',state.tasks.filter(t=>["In review","Awaiting approval"].includes(t.status)).length],['Goals',state.goals.length]].map(x=>'<article class="stat-card"><div class="stat-caption">'+x[0]+'</div><div class="stat-number">'+x[1]+'</div></article>').join("")+'</div><div class="workspace-section-head"><div><h2>Tasks</h2><p>Execution and approvals stay separate from goal outcomes.</p></div><button id="os-task-add" class="button button-primary">＋ New task</button></div><div class="toolbar"><button id="os-board" class="button button-secondary">Board view</button><input id="os-task-filter" class="search-input" placeholder="Search tasks, owners or workstreams"></div><div id="os-task-view"></div><div class="workspace-section-head goals-heading"><div><h2>Goals</h2><p>Track outcomes independently; link tasks to the outcomes they support.</p></div></div><div class="goal-grid">'+state.goals.map((g,i)=>'<article class="goal-card"><div class="goal-card-top"><span class="goal-dot"></span><span class="tag">'+(i===0?'Growth':i===1?'Efficiency':'Output')+'</span></div><h3>'+esc(g.name)+'</h3><div class="goal-metric">'+g.actual+' <span>/ '+g.target+' '+esc(g.unit)+'</span></div><div class="goal-progress"><span style="width:'+Math.min(100,Math.round(g.actual/g.target*100))+'%"></span></div><p>Illustrative baseline — connect verified data before making decisions.</p></article>').join("")+'</div>'+panel("Approval workflow",'<p>Contributors submit work for review. Only authorised admins approve completion; medical and comparative claims require evidence and human review.</p>');
   }
   function board() {
     const statuses=["To do","In progress","In review","Awaiting approval","Done"];
@@ -115,7 +111,7 @@
   }
   function calendar() {
     const days=Array.from({length:14},(_,i)=>plusDays(i));
-    $("#os-task-view").innerHTML='<div class="focus-grid" style="grid-template-columns:repeat(7,minmax(130px,1fr));overflow-x:auto">'+days.map(d=>'<article class="panel"><div class="eyebrow">'+new Date(d+"T12:00:00").toLocaleDateString("en-IN",{weekday:"short"})+'</div><h3>'+fmt(d)+'</h3>'+state.tasks.filter(t=>t.due===d).map(t=>'<div class="focus-card" style="margin-top:8px"><b>'+esc(t.title)+'</b><p>'+esc(t.owner)+' · '+esc(t.status)+'</p></div>').join("")+'</article>').join("")+'</div>';
+    return '<div class="calendar-toolbar"><div><h2>Next 14 days</h2><p>Task deadlines and content delivery dates.</p></div><span class="tag">India time · IST</span></div><div class="calendar-grid">'+days.map(d=>'<article class="calendar-day '+(d===plusDays(0)?'is-today':'')+'"><div class="eyebrow">'+new Date(d+"T12:00:00").toLocaleDateString("en-IN",{weekday:"short"})+'</div><h3>'+fmt(d)+'</h3>'+state.tasks.filter(t=>t.due===d).map(t=>'<div class="calendar-event"><b>'+esc(t.title)+'</b><span>'+esc(t.owner)+' · '+esc(t.status)+'</span></div>').join("")+'</article>').join("")+'</div>';
   }
   function team() {
     const names=Array.from(new Set(["Tanvi","Nikita","Sai"].concat(state.tasks.map(t=>t.owner))));
@@ -149,9 +145,10 @@
     show("execution");
   }
   function render() {
-    const c=$("#os-content"); if(!c)return; const v=state.view||"command";
-    c.innerHTML=({command,intelligence,research,creative,execution,team,learning,goals})[v]();
-    if(v==="execution"){ $("#os-board").onclick=board;$("#os-calendar").onclick=calendar;$("#os-task-add").onclick=newTask;board(); }
+    const c=$("#os-content"); if(!c)return; const v=state.view||"execution";
+    c.innerHTML=({intelligence,research,creative,execution,calendar})[v]();
+    if(v==="execution"){ $("#os-board").onclick=board;$("#os-task-add").onclick=newTask;board(); const f=$("#os-task-filter"); if(f) f.oninput=()=>{const q=f.value.toLowerCase();$("[data-status]").forEach(()=>{});const all=state.tasks;state.tasks=all.filter(t=>(t.title+" "+t.owner+" "+t.pillar).toLowerCase().includes(q));board();state.tasks=all;}; }
+    if(v==="calendar") calendar();
     if(v==="research") { $("[data-radar-tab]").forEach(b=>b.onclick=()=>{ $("[data-radar-tab]").forEach(x=>x.className="button button-secondary"); b.className="button button-primary"; const q=$("#os-research-query").value.trim(); $("#os-radar-results").innerHTML='<div class="panel"><div class="panel-heading"><div><h3>'+esc(b.textContent)+' queue</h3><p>'+(q?'Topic: '+esc(q):'Choose a topic to build a focused collection brief.')+'</p></div></div><p>Live collection is not connected yet. Use “Create research brief” to save the question for source-led research.</p></div>'; }); }
     if(v==="learning")$("#os-learning-form").addEventListener("submit",e=>{e.preventDefault();state.learnings.unshift(Object.fromEntries(new FormData(e.target)));save();render();});
     $$("[data-promote]").forEach(b=>b.onclick=()=>{const i=state.intelligence[Number(b.dataset.promote)];state.tasks.unshift({id:"t"+Date.now(),title:i.title,owner:"Saurabh",status:"To do",priority:"Medium",due:plusDays(2),pillar:i.type,doc:""});save();show("execution");});
