@@ -49,10 +49,14 @@
       [["command","Command center"],["intelligence","AI intelligence"],["research","Research radar"],["creative","Creative intelligence"],["execution","Tasks & calendar"],["team","Team workload"],["learning","Learning loop"]].map(x => '<button class="nav-item" data-os-view="' + x[0] + '"><span class="nav-icon">◫</span>' + x[1] + '</button>').join("");
     nav.after(group);
     const section = document.createElement("section"); section.id = "os-workspace"; section.className = "view";
-    section.innerHTML = '<div class="page-heading"><div><div class="eyebrow">MARKETING OPERATING SYSTEM</div><h1 id="os-title">Command center</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New task</button></div><div id="os-content"></div>';
+    section.innerHTML = '<div class="page-heading"><div><div class="eyebrow">AKIDHA · MARKETING OPERATING SYSTEM</div><h1 id="os-title">Command center</h1><p class="lede" id="os-subtitle"></p></div><button class="button button-primary" id="os-new-task">＋ New task</button></div><div id="os-content"></div><div class="os-modal-backdrop" id="os-task-modal" hidden><section class="os-modal" role="dialog" aria-modal="true" aria-labelledby="os-task-modal-title"><div class="os-modal-head"><div><div class="eyebrow">WORK MANAGEMENT</div><h2 id="os-task-modal-title">Create a task</h2><p>Give the work a clear owner and next step.</p></div><button type="button" class="os-modal-close" id="os-task-close" aria-label="Close">×</button></div><form id="os-task-form" class="os-task-form"><label>Task title<input name="title" required maxlength="140" placeholder="e.g. Draft substitute-trust carousel"></label><div class="os-form-grid"><label>Owner<select name="owner"><option>Nikita</option><option>Sai</option><option>Tanvi</option><option>Saurabh</option></select></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label><label>Due date<input type="date" name="due" required value="' + plusDays(2) + '"></label><label>Workstream<select name="pillar"><option>Medicine education</option><option>Trust & transparency</option><option>Audience intelligence</option><option>Performance learning</option><option>General</option></select></label></div><label>Work document link <span class="os-optional">Optional</span><input name="doc" type="url" placeholder="https://docs.google.com/..."></label><div class="os-modal-actions"><button type="button" class="button button-secondary" id="os-task-cancel">Cancel</button><button type="submit" class="button button-primary">Create task</button></div></form></section></div>';
     main.append(section);
     $$("[data-os-view]").forEach(b => b.addEventListener("click", () => show(b.dataset.osView)));
     $("#os-new-task").addEventListener("click", newTask);
+    $("#os-task-close").addEventListener("click", closeTaskModal);
+    $("#os-task-cancel").addEventListener("click", closeTaskModal);
+    $("#os-task-modal").addEventListener("click", e => { if (e.target.id === "os-task-modal") closeTaskModal(); });
+    $("#os-task-form").addEventListener("submit", saveNewTask);
     render();
     show(state.view || "command");
   }
@@ -107,11 +111,28 @@
     return '<div class="notice"><span class="notice-icon">↻</span><div><b>Close the loop</b><span>Every campaign should leave behind a documented learning, not just a metric screenshot.</span></div></div><form id="os-learning-form" class="panel" style="display:grid;gap:12px"><label>Campaign / creative<input required name="campaign" class="search-input" placeholder="e.g. Substitute trust carousel"></label><label>Observed result<textarea required name="observation" class="search-input" rows="3" placeholder="Metric, period and source"></textarea></label><label>Interpretation / hypothesis<textarea name="hypothesis" class="search-input" rows="3" placeholder="What might explain it? Mark uncertainty clearly."></textarea></label><label>Next test<textarea name="next" class="search-input" rows="2" placeholder="What will we test next?"></textarea></label><button class="button button-primary">Save learning record</button></form>'+panel("Recorded learnings",state.learnings.length?state.learnings.map(l=>'<div class="signal-row"><div class="signal-copy"><h4>'+esc(l.campaign)+'</h4><p><b>Observation:</b> '+esc(l.observation)+'</p><p><b>Hypothesis:</b> '+esc(l.hypothesis||"Not recorded")+'</p><p><b>Next test:</b> '+esc(l.next||"Not recorded")+'</p></div></div>').join(""):"<p>No learning records yet.</p>");
   }
   function newTask() {
-    const title=prompt("Task title"); if(!title)return;
-    const owner=prompt("Owner (Saurabh, Tanvi, Nikita, Sai)","Nikita")||"Nikita";
-    const due=prompt("Due date (YYYY-MM-DD)",plusDays(2))||plusDays(2);
-    const doc=prompt("Optional Google Docs/Sheets/Word/Excel link","")||"";
-    state.tasks.unshift({id:"t"+Date.now(),title,owner,status:"To do",priority:"Medium",due,pillar:"General",doc});save();show("execution");
+    const modal = $("#os-task-modal");
+    if (!modal) return;
+    $("#os-task-form").reset();
+    $('[name="due"]', modal).value = plusDays(2);
+    modal.hidden = false;
+    document.body.classList.add("os-modal-open");
+    setTimeout(() => $('[name="title"]', modal).focus(), 30);
+  }
+  function closeTaskModal() {
+    const modal = $("#os-task-modal");
+    if (modal) modal.hidden = true;
+    document.body.classList.remove("os-modal-open");
+  }
+  function saveNewTask(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+    const title = String(data.title || "").trim();
+    if (!title) return;
+    state.tasks.unshift({id:"t"+Date.now(),title,owner:data.owner || "Nikita",status:"To do",priority:data.priority || "Medium",due:data.due || plusDays(2),pillar:data.pillar || "General",doc:data.doc || ""});
+    save();
+    closeTaskModal();
+    show("execution");
   }
   function render() {
     const c=$("#os-content"); if(!c)return; const v=state.view||"command";
