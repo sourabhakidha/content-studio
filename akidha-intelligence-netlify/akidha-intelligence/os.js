@@ -47,6 +47,7 @@
     main.append(section);
     $$("[data-os-view]").forEach(b => b.addEventListener("click", () => show(b.dataset.osView)));
     $("#os-new-task").addEventListener("click", newTask);
+    $("#os-activity-type").addEventListener("change", syncActivityType);
     $("#os-task-close").addEventListener("click", closeTaskModal);
     $("#os-task-cancel").addEventListener("click", closeTaskModal);
     $("#os-task-modal").addEventListener("click", e => { if (e.target.id === "os-task-modal") closeTaskModal(); });
@@ -155,8 +156,9 @@
   function render() {
     const c=$("#os-content"); if(!c)return; const v=state.view||"execution";
     c.innerHTML=({intelligence,research,creative,execution,calendar})[v]();
-    if(v==="execution"){ $("#os-board").onclick=board;board(); const f=$("#os-task-filter"); if(f) f.oninput=()=>{const q=f.value.toLowerCase();$("[data-status]").forEach(()=>{});const all=state.tasks;state.tasks=all.filter(t=>(t.title+" "+t.owner+" "+t.pillar).toLowerCase().includes(q));board();state.tasks=all;}; }
+    if(v==="execution"){ $("#os-board").onclick=board;board(); const f=$("#os-task-filter"); if(f) f.oninput=()=>{const q=f.value.toLowerCase();const all=state.tasks;state.tasks=all.filter(t=>(t.title+" "+t.owner+" "+t.pillar).toLowerCase().includes(q));board();state.tasks=all;}; }
     if(v==="calendar") calendar();
+    if(v==="execution"){const goalBtn=$("#os-goal-add");if(goalBtn)goalBtn.onclick=()=>{newTask();$("#os-activity-type").value="goal";syncActivityType();};populateGoalOptions();$("[data-goal-link]").forEach(b=>b.onclick=()=>{newTask();$("#os-task-goal").value=b.dataset.goalLink;});}
     if(v==="execution"){const goalBtn=$("#os-goal-add");if(goalBtn)goalBtn.onclick=()=>{newTask();$("#os-activity-type").value="goal";syncActivityType();};populateGoalOptions();}
     if(v==="research") { $("[data-radar-tab]").forEach(b=>b.onclick=()=>{ $("[data-radar-tab]").forEach(x=>x.className="button button-secondary"); b.className="button button-primary"; const q=$("#os-research-query").value.trim(); $("#os-radar-results").innerHTML='<div class="panel"><div class="panel-heading"><div><h3>'+esc(b.textContent)+' queue</h3><p>'+(q?'Topic: '+esc(q):'Choose a topic to build a focused collection brief.')+'</p></div></div><p>Live collection is not connected yet. Use “Create research brief” to save the question for source-led research.</p></div>'; }); }
     if(v==="learning")$("#os-learning-form").addEventListener("submit",e=>{e.preventDefault();state.learnings.unshift(Object.fromEntries(new FormData(e.target)));save();render();});
