@@ -54,6 +54,7 @@
     $$("[data-os-view]").forEach(b => b.addEventListener("click", () => show(b.dataset.osView)));
     $("#os-new-task").addEventListener("click", newTask);
     render();
+    show(state.view || "command");
   }
   function show(v) {
     state.view = v; save();
@@ -68,7 +69,7 @@
   function task(t) { return '<div class="signal-row"><span class="source-icon">▦</span><div class="signal-copy" style="flex:1"><h4>' + esc(t.title) + '</h4><div class="signal-meta">' + esc(t.owner) + ' · ' + esc(t.status) + ' · Due ' + fmt(t.due) + '</div>' + (t.doc ? '<a target="_blank" rel="noopener" href="' + esc(t.doc) + '">Open work ↗</a>' : '') + '</div><span class="tag">' + esc(t.priority) + '</span></div>'; }
   function command() {
     const stats = [["Active tasks",state.tasks.filter(t=>t.status!=="Done").length],["Awaiting approval",state.tasks.filter(t=>t.status==="Awaiting approval").length],["Intelligence signals",state.intelligence.length],["Learning records",state.learnings.length]];
-    return '<div class="stats-grid">' + stats.map(x=>'<article class="stat-card"><div class="stat-top"><span>'+x[0]+'</span></div><div class="stat-number">'+x[1]+'</div><div class="stat-caption">Demo/local records until shared API is connected</div></article>').join("") + '</div><div class="lower-grid">' +
+    return '<div class="notice notice-muted"><span class="notice-icon">i</span><div><b>Preview data — not live business metrics</b><span>Tasks, goals and recommendations on this screen are illustrative examples saved in this browser. Shared team data and live performance reporting are not connected yet.</span></div></div><div class="stats-grid">' + stats.map(x=>'<article class="stat-card"><div class="stat-top"><span>'+x[0]+'</span></div><div class="stat-number">'+x[1]+'</div><div class="stat-caption">Illustrative local records</div></article>').join("") + '</div><div class="lower-grid">'
       panel("AI brief for today",state.intelligence.slice(0,2).map(i=>'<div class="signal-row"><span class="source-icon">✳</span><div class="signal-copy"><h4>'+esc(i.title)+'</h4><p>'+esc(i.detail)+'</p><div class="signal-meta">'+esc(i.source)+'</div></div></div>').join("")) +
       panel("Goal progress",state.goals.map(g=>'<div style="padding:12px 0"><div style="display:flex;justify-content:space-between"><b>'+esc(g.name)+'</b><span>'+g.actual+' / '+g.target+' '+esc(g.unit)+'</span></div><div style="height:7px;background:#e8ebe4;border-radius:8px;margin-top:8px"><div style="height:100%;width:'+Math.min(100,Math.round(g.actual/g.target*100))+'%;background:#64836e;border-radius:8px"></div></div></div>').join("")) +
       '</div>' + panel("Priority work",state.tasks.map(task).join(""));
