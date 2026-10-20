@@ -1,0 +1,25 @@
+{
+  "name": "akidha-marketing-os",
+  "version": "1.0.0",
+  "description": "Akidha Marketing OS — Comprehensive AI-Powered Marketing Operations Platform",
+  "main": "apps-script/Code.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/**/*.test.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js",
+    "lint:syntax": "node --check apps-script/Code.js",
+    "clasp:status": "clasp status"
+  },
+  "keywords": [
+    "akidha",
+    "marketing-os",
+    "google-apps-script",
+    "healthcare-marketing",
+    "compliance",
+    "ai-creative-studio"
+  ],
+  "author": "Akidha Engineering",
+  "license": "UNLICENSED"
+}
+

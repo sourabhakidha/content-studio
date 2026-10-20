@@ -1,0 +1,82 @@
+name: Deploy Akidha Marketing OS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      description:
+        description: 'Deployment changelog / description'
+        required: false
+        default: 'Automated CI/CD deployment'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Clasp
+        run: npm install -g @google/clasp
+
+      - name: Run Pre-Deployment Verification Tests
+        run: |
+          npm run lint:syntax
+          npm test
+
+      - name: Configure Clasp Credentials
+        run: |
+          echo "${{ secrets.CLASPRC_JSON }}" > ~/.clasprc.json
+
+      - name: Set Target Script ID
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            SCRIPT_ID="${{ secrets.PROD_SCRIPT_ID }}"
+          else
+            SCRIPT_ID="${{ secrets.STAGING_SCRIPT_ID }}"
+          fi
+          if [ -z "$SCRIPT_ID" ]; then
+            echo "::error::Missing script ID secret for target environment."
+            exit 1
+          fi
+          TARGET_SCRIPT_ID="$SCRIPT_ID" node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('.clasp.json', 'utf8'));
+            cfg.scriptId = process.env.TARGET_SCRIPT_ID;
+            cfg.rootDir = 'apps-script';
+            fs.writeFileSync('.clasp.json', JSON.stringify(cfg, null, 2));
+          "
+
+      - name: Verify Production Deployment ID
+        if: ${{ inputs.environment == 'production' }}
+        env:
+          DEPLOYMENT_ID: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        run: |
+          if [ -z "$DEPLOYMENT_ID" ]; then
+            echo "::error::Set PROD_DEPLOYMENT_ID to the existing live deployment ID before deploying."
+            exit 1
+          fi
+
+      - name: Push Code to Apps Script
+        run: clasp push --force
+
+      - name: Update Existing Production Deployment
+        if: ${{ inputs.environment == 'production' }}
+        env:
+          DEPLOYMENT_ID: ${{ secrets.PROD_DEPLOYMENT_ID }}
+        run: clasp deploy --deploymentId "$DEPLOYMENT_ID" --description "${{ inputs.description }}"
+

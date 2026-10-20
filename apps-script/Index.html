@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>Akidha Marketing OS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --navy: #193549;
+      --navy-light: #244b63;
+      --navy-dark: #10212e;
+      --accent: #2e78d2;
+      --accent-soft: #eaf2fc;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --border: #dbe2ea;
+      --text: #172838;
+      --muted: #647587;
+      --green: #1e824c;
+      --green-soft: #eafaf1;
+      --yellow: #b78103;
+      --yellow-soft: #fef9e7;
+      --red: #c0392b;
+      --red-soft: #fdedec;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    }
+    .brand-group h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 750;
+      letter-spacing: -0.3px;
+    }
+    .brand-group p {
+      margin: 2px 0 0;
+      font-size: 11.5px;
+      color: #b9d3e5;
+    }
+    .user-pill {
+      background: rgba(255,255,255,0.15);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .role-badge {
+      background: #3bb273;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .role-badge.admin { background: #e67e22; }
+
+    main {
+      max-width: 1400px;
+      margin: 18px auto;
+      padding: 0 18px 40px;
+    }
+    #messageBanner {
+      display: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-weight: 550;
+      font-size: 12.5px;
+    }
+    .msg-success { background: var(--green-soft); color: var(--green); border: 1px solid #b7dec2; display: block!important; }
+    .msg-error { background: var(--red-soft); color: var(--red); border: 1px solid #f5b7b1; display: block!important; }
+    .msg-info { background: var(--accent-soft); color: var(--accent); border: 1px solid #aecbeb; display: block!important; }
+
+    /* Stats Overview */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+    }
+    .stat-label { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+    .stat-value { font-size: 23px; font-weight: 750; color: var(--navy); margin-top: 4px; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* Main Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      background: #e6ecf2;
+      padding: 5px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.7); }
+    .tab-btn.active {
+      background: var(--navy);
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .tab-count {
+      background: rgba(0,0,0,0.15);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 10.5px;
+    }
+    .tab-btn.active .tab-count { background: rgba(255,255,255,0.25); }
+
+    /* Panels & Layouts */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-header h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* Buttons & Inputs */
+    button {
+      font: inherit;
+      border-radius: 7px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    button.btn-primary {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: white;
+    }
+    button.btn-accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    button.btn-danger {
+      background: var(--red);
+      border-color: var(--red);
+      color: white;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    input, select, textarea {
+      width: 100%;
+      font: inherit;
+      padding: 8px 10px;
+      border: 1px solid #cbd6df;
+      border-radius: 7px;
+      background: white;
+      color: var(--text);
+      margin-top: 4px;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .form-field { display: flex; flex-direction: column; }
+    .form-field label { font-size: 11.5px; font-weight: 650; color: var(--navy); }
+
+    /* Kanban Board */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      align-items: start;
+    }
+    .kanban-col {
+      background: #edf1f5;
+      border: 1px solid #d7e0ea;
+      border-radius: 9px;
+      padding: 10px;
+      min-height: 380px;
+    }
+    .kanban-col-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .card-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 9px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.1s ease;
+    }
+    .card-item:hover { border-color: #b0c2d3; }
+    .card-item h3 { margin: 0 0 5px; font-size: 13.5px; font-weight: 700; }
+    .tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 10.5px;
+      font-weight: 600;
+      background: #e8f0f6;
+      color: var(--navy);
+      margin: 2px 3px 2px 0;
+    }
+    .tag-Urgent { background: #fcdbd8; color: #9c2727; }
+    .tag-High { background: #fde8d0; color: #a04000; }
+    .tag-Medium { background: #fef5d1; color: #7d6608; }
+    .tag-Low { background: #d5f5e3; color: #1e8449; }
+    .tag-pending { background: #fdebd0; color: #b9770e; }
+    .tag-approved { background: #d4efdf; color: #196f3d; }
+    .tag-rejected { background: #fadbd8; color: #922b21; }
+
+    /* Progress & Utilization Bars */
+    .meter {
+      height: 9px;
+      background: #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+    .meter span {
+      display: block;
+      height: 100%;
+      background: var(--navy);
+      border-radius: 20px;
+    }
+    .meter span.overload { background: var(--red); }
+
+    /* Calendar Grid */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(130px, 1fr));
+      gap: 8px;
+      overflow-x: auto;
+    }
+    .cal-day {
+      background: #f7f9fc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      min-height: 120px;
+    }
+    .cal-day.weekend { background: #eef2f7; }
+    .cal-day-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .cal-task-pill {
+      background: white;
+      border-left: 3px solid var(--navy);
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      margin-bottom: 4px;
+      border-top: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Compliance Flags */
+    .compliance-flag-box {
+      border: 1px solid #ebd38f;
+      background: #fffdf5;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .flag-CRITICAL { color: var(--red); font-weight: 700; }
+    .flag-WARNING { color: var(--yellow); font-weight: 600; }
+    .flag-INFO { color: var(--accent); }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 650px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 800px) {
+      .kanban-board { grid-template-columns: 1fr; }
+      .cal-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand-group">
+    <h1>Akidha Marketing OS</h1>
+    <p>Plan · Produce · Comply · Measure · Learn · Healthcare Marketing Platform</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="user-pill" id="userPill">
+      <span id="userName">Checking access…</span>
+      <span class="role-badge" id="userRole">…</span>
+    </div>
+    <button class="btn-accent" onclick="openAiStudioModal()">✨ AI Studio</button>
+    <button onclick="refreshData()">↻ Refresh</button>
+  </div>
+</header>
+
+<main>
+  <div id="messageBanner"></div>
+
+  <!-- Key Aggregate Metrics Bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Open Tasks</div>
+      <div class="stat-value" id="statOpenTasks">—</div>
+      <div class="stat-sub" id="statOverdueTasks">— overdue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Approvals</div>
+      <div class="stat-value" id="statApprovals">—</div>
+      <div class="stat-sub" id="statMedicalReviews">— claims in review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Team Capacity</div>
+      <div class="stat-value" id="statCapacity">—</div>
+      <div class="stat-sub" id="statWorkload">— of 32h daily cap</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Goals Tracked</div>
+      <div class="stat-value" id="statGoals">—</div>
+      <div class="stat-sub" id="statSignals">— market signals</div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-view="command" onclick="switchView('command')">◫ Command Center</button>
+    <button class="tab-btn" data-view="tasks" onclick="switchView('tasks')">📋 Tasks & Calendar <span class="tab-count" id="countTasks">0</span></button>
+    <button class="tab-btn" data-view="creatives" onclick="switchView('creatives')">🎨 Creative Pipeline <span class="tab-count" id="countCreatives">0</span></button>
+    <button class="tab-btn" data-view="radar" onclick="switchView('radar')">📡 Market Intelligence <span class="tab-count" id="countSignals">0</span></button>
+    <button class="tab-btn" data-view="team" onclick="switchView('team')">👥 Team Capacity (8h Shift)</button>
+    <button class="tab-btn" data-view="goals" onclick="switchView('goals')">🎯 Goals & Analytics</button>
+    <button class="tab-btn" data-view="learnings" onclick="switchView('learnings')">↻ Learning Loop</button>
+    <button class="tab-btn" data-view="approvals" id="approvalsTabBtn" onclick="switchView('approvals')">🛡 Approvals & Audit</button>
+  </nav>
+
+  <!-- ==================== VIEW 1: COMMAND CENTER ==================== -->
+  <section id="view-command" class="view-section active">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Strategic Command Center</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn-primary" onclick="openNewTaskModal()">＋ New Task</button>
+          <button class="btn-accent" onclick="openAiStudioModal()">✨ Generate Content</button>
+        </div>
+      </div>
+      <p style="color:var(--muted);margin-top:0">One unified console connecting strategic pillars, market intelligence, compliance validation, and measured performance.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:14px;margin-top:14px">
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:#fafbfc">
+          <strong style="color:var(--navy);font-size:13px">🏥 Akidha Strategic Pillars</strong>
+          <div id="cmdThemesList" style="margin-top:8px">Loading pillars…</div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:#fafbfc">
+          <strong style="color:var(--navy);font-size:13px">⚠️ Immediate Attention Items</strong>
+          <div id="cmdAttentionList" style="margin-top:8px">Evaluating tasks…</div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:#fafbfc">
+          <strong style="color:var(--navy);font-size:13px">📡 Top Relevant Market Signals</strong>
+          <div id="cmdSignalsList" style="margin-top:8px">Loading signals…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 2: TASKS & CALENDAR ==================== -->
+  <section id="view-tasks" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Task Board & Calendar</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div style="display:flex;gap:4px">
+            <button id="btnSubBoard" class="btn-primary" onclick="toggleTaskSubView('board')">Board</button>
+            <button id="btnSubCalendar" onclick="toggleTaskSubView('calendar')">14-Day Calendar</button>
+          </div>
+          <button class="btn-primary" onclick="openNewTaskModal()">＋ Create Task</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <input id="taskSearch" placeholder="Search tasks by title, brief or ID…" oninput="renderTasks()" style="max-width:260px">
+        <select id="taskFilterOwner" onchange="renderTasks()" style="max-width:180px"><option value="">All Assignees</option></select>
+        <select id="taskFilterPriority" onchange="renderTasks()" style="max-width:140px"><option value="">All Priorities</option></select>
+        <select id="taskFilterCategory" onchange="renderTasks()" style="max-width:160px"><option value="">All Categories</option></select>
+      </div>
+
+      <!-- Subview: Kanban Board -->
+      <div id="taskBoardContainer" class="kanban-board">
+        <div class="kanban-col" id="colBacklog"><div class="kanban-col-head"><span>Backlog</span><span class="tab-count" id="countColBacklog">0</span></div><div class="col-cards"></div></div>
+        <div class="kanban-col" id="colInProgress"><div class="kanban-col-head"><span>In Progress / Scripting</span><span class="tab-count" id="countColInProgress">0</span></div><div class="col-cards"></div></div>
+        <div class="kanban-col" id="colReview"><div class="kanban-col-head"><span>Review / Blocked</span><span class="tab-count" id="countColReview">0</span></div><div class="col-cards"></div></div>
+        <div class="kanban-col" id="colReady"><div class="kanban-col-head"><span>Ready / Published</span><span class="tab-count" id="countColReady">0</span></div><div class="col-cards"></div></div>
+        <div class="kanban-col" id="colComplete"><div class="kanban-col-head"><span>Completed</span><span class="tab-count" id="countColComplete">0</span></div><div class="col-cards"></div></div>
+      </div>
+
+      <!-- Subview: Calendar -->
+      <div id="taskCalendarContainer" style="display:none">
+        <div class="cal-grid" id="calGrid">Loading 14-day schedule…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 3: CREATIVE PIPELINE ==================== -->
+  <section id="view-creatives" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Creative Production & Medical Compliance Pipeline</h2>
+        <button class="btn-primary" onclick="openNewCreativeModal()">＋ Add Creative</button>
+      </div>
+      <p style="color:var(--muted);margin-top:0">Medical, clinical equivalence, safety, and pricing claims require explicit human sign-off before publishing.</p>
+
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <select id="creativeFilterStage" onchange="renderCreatives()" style="max-width:180px"><option value="">All Workflow Stages</option></select>
+        <select id="creativeFilterPlatform" onchange="renderCreatives()" style="max-width:160px"><option value="">All Platforms</option></select>
+        <select id="creativeFilterReview" onchange="renderCreatives()" style="max-width:180px"><option value="">All Review Statuses</option></select>
+      </div>
+
+      <div id="creativesList" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:12px">
+        Loading creatives…
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 4: MARKET INTELLIGENCE ==================== -->
+  <section id="view-radar" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Akidha Market Intelligence Radar</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn-accent" onclick="triggerIntelligenceRefresh()">⚡ Ingest Live News & Reddit</button>
+        </div>
+      </div>
+      <p style="color:var(--muted);margin-top:0">Automated collection from NPPA drug price notifications, CDSCO orders, chronic disease news, and patient forum queries.</p>
+
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <select id="signalFilterCat" onchange="renderSignals()" style="max-width:170px"><option value="">All Categories</option></select>
+        <select id="signalFilterIntent" onchange="renderSignals()" style="max-width:170px"><option value="">All Intents</option></select>
+      </div>
+
+      <div id="signalsList" style="display:grid;gap:10px">Loading signals…</div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 5: TEAM CAPACITY ==================== -->
+  <section id="view-team" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Team Workload & Capacity Planning (8-Hour Productive Day)</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:12px;font-weight:600">Shift Model:</span>
+          <select id="shiftSelector" onchange="refreshData()" style="max-width:180px">
+            <option value="09">9:00 AM – 6:00 PM (8h)</option>
+            <option value="10">10:00 AM – 7:00 PM (8h)</option>
+          </select>
+        </div>
+      </div>
+      <p style="color:var(--muted);margin-top:0">Each shift reserves 1 hour for breaks, yielding 8 schedulable productive hours per person per day.</p>
+      <div id="capacityContainer" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px">
+        Loading capacity metrics…
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 6: GOALS & PERFORMANCE ==================== -->
+  <section id="view-goals" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Strategic Goals & Performance Attribution</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn-primary" id="btnNewGoal" onclick="openNewGoalModal()">＋ Create Goal</button>
+          <button class="btn-accent" onclick="openRecordObsModal()">＋ Log Metric Observation</button>
+        </div>
+      </div>
+      <div id="goalsList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:12px">
+        Loading goals…
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 7: LEARNING LOOP ==================== -->
+  <section id="view-learnings" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Campaign Retrospective Learning Loop</h2>
+        <button class="btn-primary" onclick="openNewLearningModal()">＋ Record Learning</button>
+      </div>
+      <p style="color:var(--muted);margin-top:0">Every campaign must produce documented learnings (Hypothesis $\to$ Observation $\to$ Next Test). Approved learnings directly enrich AI Studio prompts.</p>
+      <div id="learningsList" style="display:grid;gap:12px">Loading recorded learnings…</div>
+    </div>
+  </section>
+
+  <!-- ==================== VIEW 8: APPROVALS & AUDIT ==================== -->
+  <section id="view-approvals" class="view-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Pending Approvals Queue (Admin & Medical Review)</h2>
+      </div>
+      <h3 style="font-size:14px;color:var(--navy);margin-top:0">Task Completion Requests</h3>
+      <div id="approvalsList" style="display:grid;gap:10px;margin-bottom:20px">Loading approvals…</div>
+
+      <h3 style="font-size:14px;color:var(--navy)">Medical & Claims Review Requests</h3>
+      <div id="medicalReviewsList" style="display:grid;gap:10px">Loading medical reviews…</div>
+    </div>
+  </section>
+</main>
+
+<!-- ==================== MODAL: TASK CREATION / EDIT ==================== -->
+<div id="taskModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="panel-header">
+      <h2 id="taskModalTitle">Create Task</h2>
+      <button onclick="closeModal('taskModal')">✕</button>
+    </div>
+    <form id="taskForm" onsubmit="handleTaskSubmit(event)">
+      <input type="hidden" id="taskEditId">
+      <div class="form-field">
+        <label>Task Title *</label>
+        <input id="modalTaskTitle" required maxlength="160" placeholder="e.g. Draft Instagram Carousel on Metformin Substitutes">
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Brief / Acceptance Criteria</label>
+        <textarea id="modalTaskBrief" placeholder="Detailed objective, key messaging, compliance instructions…"></textarea>
+      </div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="form-field">
+          <label>Assignee</label>
+          <select id="modalTaskOwner"></select>
+        </div>
+        <div class="form-field">
+          <label>Priority</label>
+          <select id="modalTaskPriority"></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Category</label>
+          <select id="modalTaskCategory"></select>
+        </div>
+        <div class="form-field">
+          <label>Due Date</label>
+          <input type="date" id="modalTaskDue">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Estimate (Minutes)</label>
+          <input type="number" id="modalTaskEstimate" min="0" step="15" placeholder="180">
+        </div>
+        <div class="form-field">
+          <label>Linked Goal</label>
+          <select id="modalTaskGoal"><option value="">No Goal</option></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Theme / Pillar</label>
+          <select id="modalTaskTheme"></select>
+        </div>
+        <div class="form-field">
+          <label>Google Drive Asset / Script Link</label>
+          <input type="url" id="modalTaskDoc" placeholder="https://docs.google.com/…">
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Prerequisite Dependencies (Must Complete First)</label>
+        <select id="modalTaskDeps" multiple style="min-height:75px"></select>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+        <button type="button" onclick="closeModal('taskModal')">Cancel</button>
+        <button type="submit" class="btn-primary" id="btnSaveTask">Save Task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== MODAL: AI CREATIVE STUDIO ==================== -->
+<div id="aiStudioModal" class="modal-backdrop">
+  <div class="modal-card" style="max-width:750px">
+    <div class="panel-header">
+      <h2>✨ AI Creative Studio (Healthcare Guardrails)</h2>
+      <button onclick="closeModal('aiStudioModal')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+      <div class="form-field">
+        <label>Platform / Channel</label>
+        <select id="aiPlatform">
+          <option>Instagram Carousel</option>
+          <option>Instagram Reel / Short Video</option>
+          <option>WhatsApp Educational Broadcast</option>
+          <option>Meta Ad Creative</option>
+          <option>Educational Article / Brief</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Format</label>
+        <select id="aiFormat">
+          <option>Carousel (Slide-by-slide)</option>
+          <option>Video Script (Scene & Audio)</option>
+          <option>Direct Message / Post</option>
+          <option>Ad Copy (Primary + Headline)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Topic / Strategic Objective *</label>
+      <textarea id="aiTopic" placeholder="e.g. Explain how WHO-GMP certified substitute medicines match brand names in quality and save patients money on monthly blood pressure prescriptions."></textarea>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <span style="font-size:11px;color:var(--muted)">Includes Akidha brand voice rules & past approved learnings.</span>
+      <button class="btn-accent" id="btnGenerateAi" onclick="generateAiDraft()">⚡ Generate Draft</button>
+    </div>
+
+    <!-- AI Output & Compliance Scan -->
+    <div id="aiOutputSection" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+      <div class="form-field">
+        <label>Generated Title</label>
+        <input id="aiGeneratedTitle">
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Draft Copy</label>
+        <textarea id="aiGeneratedCopy" style="min-height:140px"></textarea>
+      </div>
+      <div id="aiComplianceBox" class="compliance-flag-box"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn-primary" onclick="convertAiToTask()">Promote Draft to Task & Creative</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: ADD CREATIVE ITEM ==================== -->
+<div id="creativeModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="panel-header">
+      <h2>Add Creative Asset</h2>
+      <button onclick="closeModal('creativeModal')">✕</button>
+    </div>
+    <form id="creativeForm" onsubmit="handleCreativeSubmit(event)">
+      <div class="form-field">
+        <label>Linked Task *</label>
+        <select id="modalCreativeTask" required></select>
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Creative Title *</label>
+        <input id="modalCreativeTitle" required maxlength="160" placeholder="e.g. Substitute Trust Explainer Carousel">
+      </div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="form-field">
+          <label>Platform *</label>
+          <select id="modalCreativePlatform">
+            <option>Instagram</option><option>Facebook</option><option>WhatsApp</option><option>YouTube</option><option>Offline</option><option>Website</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Format *</label>
+          <select id="modalCreativeFormat">
+            <option>Carousel</option><option>Reel / Short video</option><option>Static post</option><option>Story</option><option>Ad creative</option><option>Poster / Flyer</option><option>Article</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Google Drive Script / Asset URL</label>
+        <input type="url" id="modalCreativeAssetUrl" placeholder="https://drive.google.com/…">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+        <button type="button" onclick="closeModal('creativeModal')">Cancel</button>
+        <button type="submit" class="btn-primary">Save Creative</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== MODAL: MEDICAL REVIEW SUBMISSION ==================== -->
+<div id="medicalReviewModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="panel-header">
+      <h2>Submit for Medical & Claims Review</h2>
+      <button onclick="closeModal('medicalReviewModal')">✕</button>
+    </div>
+    <input type="hidden" id="medReviewCreativeId">
+    <div class="form-field">
+      <label>Claims Notes & Clinical Reference Sources</label>
+      <textarea id="medReviewNotes" placeholder="List any medicine substitutions, WHO-GMP verification evidence, NPPA pricing citations, or clinician approval references…"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button type="button" onclick="closeModal('medicalReviewModal')">Cancel</button>
+      <button class="btn-primary" onclick="submitMedicalReviewAction()">Submit for Medical Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: RECORD LEARNING ==================== -->
+<div id="learningModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="panel-header">
+      <h2>Record Campaign Retrospective Learning</h2>
+      <button onclick="closeModal('learningModal')">✕</button>
+    </div>
+    <form id="learningForm" onsubmit="handleLearningSubmit(event)">
+      <div class="form-field">
+        <label>Campaign / Creative Name *</label>
+        <input id="modalLearnCampaign" required placeholder="e.g. October Metformin Substitute Trust Carousel">
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Observed Result / Performance Metric *</label>
+        <textarea id="modalLearnObservation" required placeholder="What actually happened? Include metric, period, and source…"></textarea>
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Interpretation / Hypothesis</label>
+        <textarea id="modalLearnHypothesis" placeholder="Why did this happen? Detail audience feedback or trust factors…"></textarea>
+      </div>
+      <div class="form-field" style="margin-top:8px">
+        <label>Next Test to Run</label>
+        <textarea id="modalLearnNext" placeholder="What will we test next based on this learning?"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+        <button type="button" onclick="closeModal('learningModal')">Cancel</button>
+        <button type="submit" class="btn-primary">Save Learning Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== FRONTEND CONTROLLER SCRIPT ==================== -->
+<script>
+let DATA = null;
+let currentTaskSubView = 'board';
+
+function callServer(fn, ...args) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(e => reject(new Error(e && e.message ? e.message : String(e))))
+      [fn](...args);
+  });
+}
+
+function showBanner(text, type = 'info') {
+  const el = document.getElementById('messageBanner');
+  el.className = 'msg-' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+  setTimeout(() => { if (el.textContent === text) el.style.display = 'none'; }, 6000);
+}
+
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+async function refreshData() {
+  try {
+    showBanner('Loading workspace data…', 'info');
+    DATA = await callServer('getBootstrapData');
+    renderHeader();
+    renderStatsBar();
+    renderCommandCenter();
+    renderTasks();
+    renderCreatives();
+    renderSignals();
+    renderCapacity();
+    renderGoals();
+    renderLearnings();
+    renderApprovals();
+    showBanner('Workspace updated.', 'success');
+  } catch (err) {
+    showBanner('Error loading data: ' + err.message, 'error');
+  }
+}
+
+function renderHeader() {
+  document.getElementById('userName').textContent = DATA.user.name;
+  const roleEl = document.getElementById('userRole');
+  roleEl.textContent = DATA.user.role;
+  roleEl.className = 'role-badge ' + (DATA.user.role === 'admin' ? 'admin' : '');
+  document.getElementById('approvalsTabBtn').style.display = DATA.user.role === 'admin' ? 'flex' : 'none';
+  if (document.getElementById('btnNewGoal')) {
+    document.getElementById('btnNewGoal').style.display = DATA.user.role === 'admin' ? 'inline-flex' : 'none';
+  }
+}
+
+function renderStatsBar() {
+  const openTasks = DATA.tasks.filter(t => t.status !== 'Completed');
+  const today = new Date().toISOString().slice(0, 10);
+  const overdue = openTasks.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today);
+
+  document.getElementById('statOpenTasks').textContent = openTasks.length;
+  document.getElementById('statOverdueTasks').textContent = overdue.length + ' overdue';
+  document.getElementById('statApprovals').textContent = DATA.approvals.length;
+  document.getElementById('statMedicalReviews').textContent = DATA.pendingMedicalReviews.length + ' claims in review';
+  document.getElementById('statCapacity').textContent = (DATA.capacity.utilizationPct || 0) + '%';
+  document.getElementById('statWorkload').textContent = DATA.capacity.totalOpenHours + 'h of ' + DATA.capacity.totalDailyCapacity + 'h';
+  document.getElementById('statGoals').textContent = DATA.goals.length;
+  document.getElementById('statSignals').textContent = DATA.marketSignals.length + ' market signals';
+
+  document.getElementById('countTasks').textContent = openTasks.length;
+  document.getElementById('countCreatives').textContent = DATA.creatives.length;
+  document.getElementById('countSignals').textContent = DATA.marketSignals.length;
+}
+
+function renderCommandCenter() {
+  const themesContainer = document.getElementById('cmdThemesList');
+  themesContainer.innerHTML = DATA.themes.map(t =>
+    `<div style="margin-bottom:6px"><strong style="color:var(--navy)">${escapeHtml(t.name)}</strong><br><small style="color:var(--muted)">${escapeHtml(t.description)} (${escapeHtml(t.audience_segment)})</small></div>`
+  ).join('') || '<small>No themes defined.</small>';
+
+  const attentionContainer = document.getElementById('cmdAttentionList');
+  const items = [];
+  if (DATA.approvals.length) items.push(`🛡 ${DATA.approvals.length} task completion approvals awaiting decision.`);
+  if (DATA.pendingMedicalReviews.length) items.push(`🏥 ${DATA.pendingMedicalReviews.length} creative medical reviews awaiting clinical sign-off.`);
+  const overloads = DATA.capacity.members.filter(m => m.isOverloaded);
+  overloads.forEach(m => items.push(`⚠️ ${m.name} is over daily capacity (${m.totalHours}h / 8h limit).`));
+  attentionContainer.innerHTML = items.length ? items.map(i => `<div style="margin-bottom:5px;font-size:12px">${escapeHtml(i)}</div>`).join('') : '<small style="color:var(--green)">All systems balanced. No urgent blockers.</small>';
+
+  const signalsContainer = document.getElementById('cmdSignalsList');
+  signalsContainer.innerHTML = DATA.marketSignals.slice(0, 3).map(s =>
+    `<div style="margin-bottom:6px;font-size:12px"><strong>${escapeHtml(s.title)}</strong><br><small style="color:var(--muted)">${escapeHtml(s.source)} · Score: ${s.relevance_score}/100</small></div>`
+  ).join('') || '<small>No market signals collected yet.</small>';
+}
+
+function renderTasks() {
+  const search = (document.getElementById('taskSearch').value || '').toLowerCase();
+  const filterOwner = document.getElementById('taskFilterOwner').value;
+  const filterPriority = document.getElementById('taskFilterPriority').value;
+  const filterCategory = document.getElementById('taskFilterCategory').value;
+
+  // Populate filter dropdowns if empty
+  populateDropdown('taskFilterOwner', DATA.team.map(u => ({ val: u.email, label: u.name })));
+  populateDropdown('taskFilterPriority', DATA.priorities.map(p => ({ val: p, label: p })));
+  populateDropdown('taskFilterCategory', DATA.categories.map(c => ({ val: c, label: c })));
+
+  const filtered = DATA.tasks.filter(t => {
+    if (search && !t.title.toLowerCase().includes(search) && !(t.brief || '').toLowerCase().includes(search)) return false;
+    if (filterOwner && t.owner_email !== filterOwner) return false;
+    if (filterPriority && t.priority !== filterPriority) return false;
+    if (filterCategory && t.category !== filterCategory) return false;
+    return true;
+  });
+
+  // Buckets for Kanban
+  const colBacklog = document.querySelector('#colBacklog .col-cards');
+  const colInProgress = document.querySelector('#colInProgress .col-cards');
+  const colReview = document.querySelector('#colReview .col-cards');
+  const colReady = document.querySelector('#colReady .col-cards');
+  const colComplete = document.querySelector('#colComplete .col-cards');
+
+  colBacklog.innerHTML = ''; colInProgress.innerHTML = ''; colReview.innerHTML = ''; colReady.innerHTML = ''; colComplete.innerHTML = '';
+
+  let cBacklog = 0, cInProgress = 0, cReview = 0, cReady = 0, cComplete = 0;
+
+  filtered.forEach(t => {
+    const cardHtml = createTaskCardHtml(t);
+    if (t.status === 'Backlog' || t.status === 'Ideation') { colBacklog.innerHTML += cardHtml; cBacklog++; }
+    else if (t.status === 'Scripting' || t.status === 'Asset Creation' || t.status === 'Storyboard' || t.status === 'In progress') { colInProgress.innerHTML += cardHtml; cInProgress++; }
+    else if (t.status === 'Admin Review' || t.status === 'Final Admin Review' || t.status === 'Blocked' || t.status === 'Completion Requested') { colReview.innerHTML += cardHtml; cReview++; }
+    else if (t.status === 'Ready to Publish' || t.status === 'Published') { colReady.innerHTML += cardHtml; cReady++; }
+    else if (t.status === 'Completed') { colComplete.innerHTML += cardHtml; cComplete++; }
+  });
+
+  document.getElementById('countColBacklog').textContent = cBacklog;
+  document.getElementById('countColInProgress').textContent = cInProgress;
+  document.getElementById('countColReview').textContent = cReview;
+  document.getElementById('countColReady').textContent = cReady;
+  document.getElementById('countColComplete').textContent = cComplete;
+
+  renderCalendar(filtered);
+}
+
+function createTaskCardHtml(t) {
+  const canEdit = DATA.user.role === 'admin' || t.owner_email === DATA.user.email;
+  const isBlocked = !!t.blocker_reason;
+  return `
+    <article class="card-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <h3>${escapeHtml(t.title)}</h3>
+        <span class="tag tag-${escapeHtml(t.priority)}">${escapeHtml(t.priority)}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">
+        ${escapeHtml(t.task_id)} · ${escapeHtml(t.owner_email || 'Unassigned')} · ${Math.round((t.estimate_minutes || 120)/60)}h
+      </div>
+      <div style="font-size:12px;margin-bottom:8px">${escapeHtml((t.brief || '').slice(0, 110))}${t.brief && t.brief.length > 110 ? '…' : ''}</div>
+      <div>
+        <span class="tag">${escapeHtml(t.category)}</span>
+        <span class="tag">${escapeHtml(t.status)}</span>
+        ${t.due_date ? `<span class="tag">Due ${escapeHtml(String(t.due_date).slice(0, 10))}</span>` : ''}
+      </div>
+      ${isBlocked ? `<p style="color:var(--red);font-size:11px;margin:4px 0 0"><strong>Blocked:</strong> ${escapeHtml(t.blocker_reason)}</p>` : ''}
+      ${t.doc_url ? `<p style="margin:6px 0 0"><a href="${escapeHtml(t.doc_url)}" target="_blank" style="color:var(--accent);font-size:11.5px">Open Drive Script ↗</a></p>` : ''}
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        ${canEdit && t.status !== 'Completed' && t.status !== 'Completion Requested' ? `
+          <button onclick="openEditTaskModal('${escapeHtml(t.task_id)}')">Edit</button>
+          <button class="btn-primary" onclick="requestTaskCompletion('${escapeHtml(t.task_id)}')">Request Done</button>
+        ` : ''}
+        ${DATA.user.role === 'admin' && t.status === 'Completion Requested' ? `
+          <button class="btn-accent" onclick="switchView('approvals')">Review</button>
+        ` : ''}
+      </div>
+    </article>
+  `;
+}
+
+function renderCalendar(tasks) {
+  const container = document.getElementById('calGrid');
+  const today = new Date();
+  let html = '';
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const dateStr = d.toISOString().slice(0, 10);
+    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+    const dayTasks = tasks.filter(t => t.due_date && String(t.due_date).slice(0, 10) === dateStr);
+
+    html += `
+      <div class="cal-day ${isWeekend ? 'weekend' : ''}">
+        <div class="cal-day-title">${d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+        ${dayTasks.map(t => `
+          <div class="cal-task-pill">
+            <strong>${escapeHtml(t.title)}</strong><br>
+            <span style="color:var(--muted)">${escapeHtml(t.owner_email || '')}</span>
+          </div>
+        `).join('') || '<span style="color:var(--muted);font-size:10px">No deadlines</span>'}
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function renderCreatives() {
+  const list = document.getElementById('creativesList');
+  if (!DATA.creatives.length) {
+    list.innerHTML = '<div style="color:var(--muted);padding:20px">No creatives created yet. Add one from a task.</div>';
+    return;
+  }
+  list.innerHTML = DATA.creatives.map(c => {
+    const canReview = DATA.user.role === 'admin';
+    return `
+      <article class="card-item">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <strong style="font-size:14px;color:var(--navy)">${escapeHtml(c.title)}</strong>
+          <span class="tag tag-${escapeHtml(c.medical_review_status || 'not_started')}">${escapeHtml(c.medical_review_status || 'not_started')}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin:4px 0">
+          ${escapeHtml(c.platform)} · ${escapeHtml(c.format)} · Stage: <strong>${escapeHtml(c.workflow_stage)}</strong>
+        </div>
+        ${c.medical_review_notes ? `<p style="font-size:11.5px;background:#f9f9f9;padding:6px;border-radius:4px;margin:6px 0"><strong>Claims Note:</strong> ${escapeHtml(c.medical_review_notes)}</p>` : ''}
+        ${c.asset_drive_url ? `<p style="margin:4px 0"><a href="${escapeHtml(c.asset_drive_url)}" target="_blank" style="color:var(--accent);font-size:11.5px">Google Drive Assets ↗</a></p>` : ''}
+        ${c.publish_url ? `<p style="margin:4px 0"><a href="${escapeHtml(c.publish_url)}" target="_blank" style="color:var(--green);font-size:11.5px">View Published Creative ↗</a></p>` : ''}
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          ${c.medical_review_status !== 'approved' ? `
+            <button onclick="openMedicalReviewModal('${escapeHtml(c.creative_id)}')">Submit for Claims Review</button>
+          ` : ''}
+          ${canReview && c.medical_review_status === 'pending' ? `
+            <button class="btn-primary" onclick="decideMedicalReviewDirect('${escapeHtml(c.creative_id)}', 'approved')">Approve Claims</button>
+            <button class="btn-danger" onclick="decideMedicalReviewDirect('${escapeHtml(c.creative_id)}', 'rejected')">Reject</button>
+          ` : ''}
+          ${canReview && c.medical_review_status === 'approved' && c.workflow_stage !== 'Published' ? `
+            <button class="btn-accent" onclick="publishCreativePrompt('${escapeHtml(c.creative_id)}')">Mark Published</button>
+          ` : ''}
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderSignals() {
+  const list = document.getElementById('signalsList');
+  if (!DATA.marketSignals.length) {
+    list.innerHTML = '<div style="color:var(--muted);padding:14px">No market signals harvested yet. Click "Ingest Live News & Reddit" to collect real-time data.</div>';
+    return;
+  }
+  list.innerHTML = DATA.marketSignals.map(s => `
+    <div class="card-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <strong>${escapeHtml(s.title)}</strong>
+        <span class="tag">Relevance: ${s.relevance_score}/100</span>
+      </div>
+      <p style="font-size:12px;margin:4px 0;color:#333">${escapeHtml(s.summary)}</p>
+      <div style="font-size:11px;color:var(--muted)">Source: ${escapeHtml(s.source)} · Intent: ${escapeHtml(s.intent)} · Category: ${escapeHtml(s.category)}</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <a href="${escapeHtml(s.url)}" target="_blank" style="font-size:11.5px;color:var(--accent)">Open Source ↗</a>
+        ${s.status !== 'promoted' ? `
+          <button class="btn-primary" onclick="promoteSignalDirect('${escapeHtml(s.signal_id)}')">Promote to Task & Brief</button>
+        ` : '<span class="tag tag-approved">Promoted</span>'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCapacity() {
+  const container = document.getElementById('capacityContainer');
+  container.innerHTML = DATA.capacity.members.map(m => `
+    <div class="card-item">
+      <div style="display:flex;justify-content:space-between">
+        <strong>${escapeHtml(m.name)}</strong>
+        <span style="font-size:11px;color:var(--muted)">${escapeHtml(m.role)}</span>
+      </div>
+      <div style="font-size:20px;font-weight:750;color:var(--navy);margin-top:6px">
+        ${m.totalHours}h <span style="font-size:12px;font-weight:normal;color:var(--muted)">/ 8h limit (${m.utilizationPct}%)</span>
+      </div>
+      <div class="meter">
+        <span style="width:${Math.min(100, m.utilizationPct)}%" class="${m.isOverloaded ? 'overload' : ''}"></span>
+      </div>
+      <div style="font-size:11.5px;color:${m.isOverloaded ? 'var(--red)' : 'var(--muted)'}">
+        ${m.isOverloaded ? `⚠️ Overloaded by ${m.excessHours}h against one-day capacity` : `${Math.round((8 - m.totalHours)*10)/10}h capacity remaining`}
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">${m.taskCount} active open task(s)</div>
+    </div>
+  `).join('');
+}
+
+function renderGoals() {
+  const list = document.getElementById('goalsList');
+  if (!DATA.goals.length) {
+    list.innerHTML = '<div style="color:var(--muted);padding:14px">No strategic goals defined.</div>';
+    return;
+  }
+  list.innerHTML = DATA.goals.map(g => {
+    const base = Number(g.baseline_value) || 0;
+    const target = Number(g.target_value) || 1;
+    const current = Number(g.current_value) || 0;
+    const pct = target !== base ? Math.max(0, Math.min(100, Math.round(((current - base) / (target - base)) * 100))) : 0;
+    return `
+      <div class="card-item">
+        <strong>${escapeHtml(g.title)}</strong>
+        <div style="font-size:11.5px;color:var(--muted);margin:4px 0">${escapeHtml(g.metric_key)} (${escapeHtml(g.unit)})</div>
+        <div style="font-size:18px;font-weight:750;color:var(--navy);margin:6px 0">
+          ${current} <span style="font-size:12px;font-weight:normal;color:var(--muted)">/ ${target} (Target)</span>
+        </div>
+        <div class="meter"><span style="width:${pct}%"></span></div>
+        <div style="font-size:11.5px;color:var(--muted)">Progress: <strong>${pct}%</strong> · Baseline: ${base}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderLearnings() {
+  const list = document.getElementById('learningsList');
+  if (!DATA.learnings.length) {
+    list.innerHTML = '<div style="color:var(--muted);padding:14px">No retrospective learnings recorded. Close the loop after each campaign.</div>';
+    return;
+  }
+  list.innerHTML = DATA.learnings.map(l => `
+    <div class="card-item">
+      <div style="display:flex;justify-content:space-between">
+        <strong style="color:var(--navy);font-size:14px">${escapeHtml(l.campaign_name)}</strong>
+        <span class="tag tag-${escapeHtml(l.status)}">${escapeHtml(l.status)}</span>
+      </div>
+      <p style="font-size:12px;margin:6px 0"><strong>Observation:</strong> ${escapeHtml(l.observation)}</p>
+      <p style="font-size:12px;margin:6px 0"><strong>Hypothesis:</strong> ${escapeHtml(l.hypothesis || 'None recorded')}</p>
+      <p style="font-size:12px;margin:6px 0"><strong>Next Test:</strong> ${escapeHtml(l.next_test || 'None recorded')}</p>
+      ${DATA.user.role === 'admin' && l.status === 'pending' ? `
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn-primary" onclick="decideLearningDirect('${escapeHtml(l.learning_id)}', 'approved')">Approve for AI Context</button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function renderApprovals() {
+  const approvalsList = document.getElementById('approvalsList');
+  if (!DATA.approvals.length) {
+    approvalsList.innerHTML = '<div style="color:var(--muted);font-size:12px">No pending task completion requests.</div>';
+  } else {
+    approvalsList.innerHTML = DATA.approvals.map(a => {
+      const task = DATA.tasks.find(t => t.task_id === a.task_id) || {};
+      return `
+        <div class="card-item">
+          <strong>${escapeHtml(task.title || a.task_id)}</strong>
+          <div style="font-size:11.5px;color:var(--muted);margin:4px 0">Requested by ${escapeHtml(a.requested_by)} on ${escapeHtml(a.requested_at)}</div>
+          <input id="approvalComment-${escapeHtml(a.approval_id)}" placeholder="Optional approval / rejection feedback…" style="margin-bottom:8px">
+          <div style="display:flex;gap:6px">
+            <button class="btn-primary" onclick="decideApproval('${escapeHtml(a.approval_id)}', 'approved')">Approve Completion</button>
+            <button class="btn-danger" onclick="decideApproval('${escapeHtml(a.approval_id)}', 'rejected')">Reject & Send Back</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const medList = document.getElementById('medicalReviewsList');
+  if (!DATA.pendingMedicalReviews.length) {
+    medList.innerHTML = '<div style="color:var(--muted);font-size:12px">No pending medical / claims reviews.</div>';
+  } else {
+    medList.innerHTML = DATA.pendingMedicalReviews.map(c => `
+      <div class="card-item">
+        <strong>${escapeHtml(c.title)}</strong>
+        <div style="font-size:11.5px;color:var(--muted);margin:4px 0">${escapeHtml(c.platform)} · ${escapeHtml(c.format)}</div>
+        ${c.medical_review_notes ? `<p style="font-size:12px;background:#f8f9fa;padding:6px;border-radius:4px"><strong>Claims Note:</strong> ${escapeHtml(c.medical_review_notes)}</p>` : ''}
+        <input id="medReviewComment-${escapeHtml(c.creative_id)}" placeholder="Clinical / claims approval comments…" style="margin-bottom:8px">
+        <div style="display:flex;gap:6px">
+          <button class="btn-primary" onclick="decideMedicalReviewDirect('${escapeHtml(c.creative_id)}', 'approved')">Sign-Off Claims</button>
+          <button class="btn-danger" onclick="decideMedicalReviewDirect('${escapeHtml(c.creative_id)}', 'rejected')">Reject Claims</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function switchView(viewName) {
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const targetSection = document.getElementById('view-' + viewName);
+  if (targetSection) targetSection.classList.add('active');
+  const targetBtn = document.querySelector(`.tab-btn[data-view="${viewName}"]`);
+  if (targetBtn) targetBtn.classList.add('active');
+}
+
+function toggleTaskSubView(sub) {
+  currentTaskSubView = sub;
+  document.getElementById('taskBoardContainer').style.display = sub === 'board' ? 'grid' : 'none';
+  document.getElementById('taskCalendarContainer').style.display = sub === 'calendar' ? 'block' : 'none';
+  document.getElementById('btnSubBoard').className = sub === 'board' ? 'btn-primary' : '';
+  document.getElementById('btnSubCalendar').className = sub === 'calendar' ? 'btn-primary' : '';
+}
+
+function populateDropdown(elId, items) {
+  const el = document.getElementById(elId);
+  const currentVal = el.value;
+  const firstOption = el.options[0] ? el.options[0].outerHTML : '';
+  el.innerHTML = firstOption + items.map(i => `<option value="${escapeHtml(i.val)}">${escapeHtml(i.label)}</option>`).join('');
+  if (currentVal) el.value = currentVal;
+}
+
+/* ==================== ACTION HANDLERS ==================== */
+
+function openNewTaskModal() {
+  document.getElementById('taskModalTitle').textContent = 'Create Task';
+  document.getElementById('taskEditId').value = '';
+  document.getElementById('taskForm').reset();
+  populateDropdown('modalTaskOwner', DATA.team.map(u => ({ val: u.email, label: u.name })));
+  populateDropdown('modalTaskPriority', DATA.priorities.map(p => ({ val: p, label: p })));
+  populateDropdown('modalTaskCategory', DATA.categories.map(c => ({ val: c, label: c })));
+  populateDropdown('modalTaskGoal', DATA.goals.map(g => ({ val: g.goal_id, label: g.title })));
+  populateDropdown('modalTaskTheme', DATA.themes.map(t => ({ val: t.name, label: t.name })));
+  populateDropdown('modalTaskDeps', DATA.allTasksForSelect.map(t => ({ val: t.task_id, label: `${t.title} (${t.task_id})` })));
+  document.getElementById('modalTaskDue').value = new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 10);
+  document.getElementById('taskModal').classList.add('open');
+}
+
+function openEditTaskModal(taskId) {
+  const task = DATA.tasks.find(t => t.task_id === taskId);
+  if (!task) return;
+  openNewTaskModal();
+  document.getElementById('taskModalTitle').textContent = 'Edit Task (' + taskId + ')';
+  document.getElementById('taskEditId').value = taskId;
+  document.getElementById('modalTaskTitle').value = task.title;
+  document.getElementById('modalTaskBrief').value = task.brief || '';
+  document.getElementById('modalTaskOwner').value = task.owner_email || '';
+  document.getElementById('modalTaskPriority').value = task.priority || 'Medium';
+  document.getElementById('modalTaskCategory').value = task.category || 'Other';
+  document.getElementById('modalTaskDue').value = task.due_date ? String(task.due_date).slice(0, 10) : '';
+  document.getElementById('modalTaskEstimate').value = task.estimate_minutes || 120;
+  document.getElementById('modalTaskGoal').value = task.goal_id || '';
+  document.getElementById('modalTaskTheme').value = task.theme || '';
+  document.getElementById('modalTaskDoc').value = task.doc_url || '';
+}
+
+async function handleTaskSubmit(e) {
+  e.preventDefault();
+  const editId = document.getElementById('taskEditId').value;
+  const depsSelect = document.getElementById('modalTaskDeps');
+  const selectedDeps = Array.from(depsSelect.selectedOptions).map(o => o.value).join(',');
+
+  const payload = {
+    title: document.getElementById('modalTaskTitle').value,
+    brief: document.getElementById('modalTaskBrief').value,
+    owner_email: document.getElementById('modalTaskOwner').value,
+    priority: document.getElementById('modalTaskPriority').value,
+    category: document.getElementById('modalTaskCategory').value,
+    due_date: document.getElementById('modalTaskDue').value,
+    estimate_minutes: document.getElementById('modalTaskEstimate').value,
+    goal_id: document.getElementById('modalTaskGoal').value,
+    theme: document.getElementById('modalTaskTheme').value,
+    doc_url: document.getElementById('modalTaskDoc').value,
+    dependencies: selectedDeps
+  };
+
+  try {
+    if (editId) {
+      await callServer('updateTask', editId, payload);
+      showBanner('Task updated successfully.', 'success');
+    } else {
+      await callServer('createTask', payload);
+      showBanner('Task created successfully.', 'success');
+    }
+    closeModal('taskModal');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error saving task: ' + err.message, 'error');
+  }
+}
+
+async function requestTaskCompletion(taskId) {
+  if (!confirm('Submit completion request for admin approval?')) return;
+  try {
+    await callServer('requestCompletion', taskId);
+    showBanner('Completion request submitted to admins.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Completion request failed: ' + err.message, 'error');
+  }
+}
+
+async function decideApproval(approvalId, decision) {
+  const comment = (document.getElementById('approvalComment-' + approvalId) || {}).value || '';
+  try {
+    await callServer('decideCompletion', approvalId, decision, comment);
+    showBanner('Approval decision saved.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error saving decision: ' + err.message, 'error');
+  }
+}
+
+function openNewCreativeModal() {
+  populateDropdown('modalCreativeTask', DATA.allTasksForSelect.map(t => ({ val: t.task_id, label: `${t.title} (${t.task_id})` })));
+  document.getElementById('creativeModal').classList.add('open');
+}
+
+async function handleCreativeSubmit(e) {
+  e.preventDefault();
+  try {
+    await callServer('createCreative', {
+      task_id: document.getElementById('modalCreativeTask').value,
+      title: document.getElementById('modalCreativeTitle').value,
+      platform: document.getElementById('modalCreativePlatform').value,
+      format: document.getElementById('modalCreativeFormat').value,
+      asset_drive_url: document.getElementById('modalCreativeAssetUrl').value
+    });
+    showBanner('Creative added to pipeline.', 'success');
+    closeModal('creativeModal');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error creating creative: ' + err.message, 'error');
+  }
+}
+
+function openMedicalReviewModal(creativeId) {
+  document.getElementById('medReviewCreativeId').value = creativeId;
+  document.getElementById('medicalReviewModal').classList.add('open');
+}
+
+async function submitMedicalReviewAction() {
+  const id = document.getElementById('medReviewCreativeId').value;
+  const notes = document.getElementById('medReviewNotes').value;
+  try {
+    await callServer('submitCreativeForMedicalReview', id, notes);
+    showBanner('Submitted for clinical claims review.', 'success');
+    closeModal('medicalReviewModal');
+    await refreshData();
+  } catch (err) {
+    showBanner('Review submission error: ' + err.message, 'error');
+  }
+}
+
+async function decideMedicalReviewDirect(creativeId, decision) {
+  const comment = (document.getElementById('medReviewComment-' + creativeId) || {}).value || (decision === 'approved' ? 'Approved for publishing' : 'Changes requested');
+  try {
+    await callServer('decideCreativeMedicalReview', creativeId, decision, comment);
+    showBanner('Medical review status updated.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Review error: ' + err.message, 'error');
+  }
+}
+
+async function publishCreativePrompt(creativeId) {
+  const url = prompt('Enter the live published creative URL (must begin with https://):');
+  if (!url) return;
+  try {
+    await callServer('updateCreativeWorkflow', creativeId, 'Published', url);
+    showBanner('Creative marked as published.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Publishing error: ' + err.message, 'error');
+  }
+}
+
+/* ==================== AI CREATIVE STUDIO ==================== */
+
+function openAiStudioModal() {
+  document.getElementById('aiStudioModal').classList.add('open');
+}
+
+async function generateAiDraft() {
+  const topic = document.getElementById('aiTopic').value.trim();
+  if (!topic) {
+    alert('Please enter a content topic or objective.');
+    return;
+  }
+  const btn = document.getElementById('btnGenerateAi');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  try {
+    const result = await callServer('generateAiCreativeDraft', {
+      topic: topic,
+      platform: document.getElementById('aiPlatform').value,
+      format: document.getElementById('aiFormat').value
+    });
+
+    document.getElementById('aiGeneratedTitle').value = result.title;
+    document.getElementById('aiGeneratedCopy').value = result.copy;
+
+    // Render compliance scanner flags
+    const compBox = document.getElementById('aiComplianceBox');
+    const comp = result.compliance || {};
+    let flagHtml = `<strong>Compliance Pre-Scan Score: ${comp.score}/100</strong>`;
+    if (comp.flags && comp.flags.length) {
+      flagHtml += comp.flags.map(f => `<div class="flag-${f.severity}">[${f.severity}] ${escapeHtml(f.message)}</div>`).join('');
+    } else {
+      flagHtml += '<div style="color:var(--green);font-size:12px;margin-top:4px">✓ No prohibited healthcare or prescription claims detected.</div>';
+    }
+    compBox.innerHTML = flagHtml;
+
+    document.getElementById('aiOutputSection').style.display = 'block';
+  } catch (err) {
+    alert('AI Generation error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Generate Draft';
+  }
+}
+
+async function convertAiToTask() {
+  const title = document.getElementById('aiGeneratedTitle').value;
+  const copy = document.getElementById('aiGeneratedCopy').value;
+  try {
+    const taskRes = await callServer('createTask', {
+      title: title,
+      brief: copy,
+      priority: 'High',
+      category: 'Social media',
+      theme: 'Trust & Transparency'
+    });
+    await callServer('createCreative', {
+      task_id: taskRes.task_id,
+      title: title,
+      platform: 'Instagram',
+      format: 'Carousel'
+    });
+    showBanner('Draft converted into Task & Creative item.', 'success');
+    closeModal('aiStudioModal');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error converting draft: ' + err.message, 'error');
+  }
+}
+
+/* ==================== MARKET INTELLIGENCE ==================== */
+
+async function triggerIntelligenceRefresh() {
+  showBanner('Ingesting live regulatory news & Reddit patient queries…', 'info');
+  try {
+    const res = await callServer('fetchMarketIntelligence', true);
+    showBanner(`Discovered ${res.totalDiscovered} signals across news and public forums.`, 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Signal ingestion error: ' + err.message, 'error');
+  }
+}
+
+async function promoteSignalDirect(signalId) {
+  try {
+    await callServer('promoteSignalToTask', signalId);
+    showBanner('Signal promoted to Task and Creative brief.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Promotion error: ' + err.message, 'error');
+  }
+}
+
+/* ==================== LEARNING LOOP ==================== */
+
+function openNewLearningModal() {
+  document.getElementById('learningForm').reset();
+  document.getElementById('learningModal').classList.add('open');
+}
+
+async function handleLearningSubmit(e) {
+  e.preventDefault();
+  try {
+    await callServer('recordLearning', {
+      campaign_name: document.getElementById('modalLearnCampaign').value,
+      observation: document.getElementById('modalLearnObservation').value,
+      hypothesis: document.getElementById('modalLearnHypothesis').value,
+      next_test: document.getElementById('modalLearnNext').value
+    });
+    showBanner('Learning recorded. Awaiting admin approval to enrich AI Studio.', 'success');
+    closeModal('learningModal');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error saving learning: ' + err.message, 'error');
+  }
+}
+
+async function decideLearningDirect(learningId, decision) {
+  try {
+    await callServer('decideLearning', learningId, decision);
+    showBanner('Learning approval updated.', 'success');
+    await refreshData();
+  } catch (err) {
+    showBanner('Error updating learning: ' + err.message, 'error');
+  }
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('open');
+}
+
+// Initial bootstrap
+refreshData();
+</script>
+</body>
+</html>
