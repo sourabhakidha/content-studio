@@ -249,9 +249,12 @@ const Db = {
 
 const Auth = {
   getCurrentUser() {
-    let email = cleanEmail_(Session.getActiveUser().getEmail());
+    // Never use the effective/deployer identity as the visitor identity:
+    // for web apps running as the deployer, that can grant every visitor the
+    // deployer's role. Fail closed when Google does not expose the active user.
+    const email = cleanEmail_(Session.getActiveUser().getEmail());
     if (!email) {
-      email = cleanEmail_(Session.getEffectiveUser().getEmail());
+      throw new Error('Google could not verify your signed-in account. Sign in with your authorized Akidha Workspace account and ensure the web app requires authenticated access.');
     }
 
     const users = Db.readObjects('Users');
@@ -271,12 +274,8 @@ const Auth = {
     if (admins.includes(email)) return { email, name: email, role: 'admin' };
     if (contributors.includes(email)) return { email, name: email, role: 'contributor' };
 
-    // Development / demo mode fallback if script properties are not yet configured
-    if (!admins.length && !contributors.length) {
-      return { email: email || 'lead.engineer@akidha.in', name: 'Akidha Lead Engineer', role: 'admin' };
-    }
-
-    throw new Error('Your Google account (' + (email || 'unidentified') + ') is not authorized for Akidha Marketing OS.');
+    // Fail closed: missing role configuration must never grant implicit admin access.
+    throw new Error('Your Google account (' + email + ') is not authorized for Akidha Marketing OS. Configure the Users sheet or ADMIN_EMAILS / CONTRIBUTOR_EMAILS Script Properties.');
   },
 
   requireAdmin(user) {
