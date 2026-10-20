@@ -1185,11 +1185,12 @@ Return valid JSON.`;
   } else if (openAiKey) {
     draftResult = callOpenAiApi_(openAiKey, systemPrompt, userPrompt);
   } else {
-    // Deterministic offline fallback draft if no external API key is configured
+    // Safe offline fallback: avoid product, sourcing, equivalence, or quality claims
+    // that have not been supported by product-specific evidence and reviewed.
     draftResult = {
-      title: 'Understanding Chronic Care Substitutes: Quality & Verification',
-      copy: `Did you know? In India, verified substitute medicines contain the exact same active therapeutic molecule as higher-priced brand names.\n\nEvery substitute dispensed by Akidha is sourced strictly from WHO-GMP compliant manufacturers and verified by licensed pharmacists.\n\nNever change your chronic prescription on your own. Always consult your doctor or pharmacist to confirm if an approved substitute is right for your regimen.`,
-      format_notes: 'Slide 1: Hook on medicine costs. Slide 2: Active molecule equivalence. Slide 3: WHO-GMP verification. Slide 4: Pharmacist consultation CTA.'
+      title: 'Questions to Ask About Medicine Substitutes',
+      copy: `Medicine costs can be confusing, especially when you manage a long-term condition.\n\nA medicine substitute should be checked for suitability with a qualified doctor or pharmacist. Do not change a prescribed medicine or dose on your own.\n\nAsk your healthcare professional what needs to be verified for your specific prescription before making a decision.`,
+      format_notes: 'Educational draft only. Verify every product-specific statement against current evidence and obtain qualified clinical review before publishing.'
     };
   }
 
